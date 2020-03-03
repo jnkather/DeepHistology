@@ -1,13 +1,19 @@
 # DeepHistology
 A pan-cancer platform for mutation prediction from routine histology by the Kather lab (http://kather.ai). This is implemented in MATLAB and requires version R2019a+ (for some visualizations, R2019b+).
 
-The data preprocessing workflow ("the Aachen protocol") is described here: https://zenodo.org/record/3694994 
+![Fig1][figure1.jpg]
 
 Briefly, to use these scripts, you should
-1. prepare your data according to the Aachen protocol
+1. prepare your data according to the Aachen protocol as described here: https://zenodo.org/record/3694994 
 2. prepare an "experiment file" which specifies the name of the project, the location of the tiles and the targets to be predicted
 3. run autoDeepLearn('experiment','<your experiment name>') to run a cross-validated experiment
 4. visualize the results with autoVisualize('experiment','<your experiment name>')
+
+An example for a possible data structure (project TCGA-CRC-DX) is:
+- experiment file 'tcga-crc-generated' is located in './experiments'
+- CLINI table 'TCGA-CRC-DX_CLINI.xlsx' is located in './cliniData' and has a column called PATIENT
+- SLIDE table 'TCGA-CRC-DX_SLIDE.csv' is located in './cliniData' and has a column called PATIENT and a column called FILENAME
+- image tiles were generated with QuPath, are named according to the Aachen protocol and are located at 'E:/TCGA-CRC-DX/BLOCKS/' 
 
 ## Main scripts and their input arguments
 
@@ -17,14 +23,14 @@ Argument | Default Value | Description
 --- | --- | ---
 experiment | '' |  which experiment to load
 gpuDev     | 1 | GPU Device (1 or greater)
-maxBlockNum | 1000 | number of blocks
+maxBlockNum | 1000 | number of  (tiles) per whole slide image
 trainFull | false | train on full dataset after xval
 modelTemplate | shufflenet512 | which pretrained model
-backwards | false | for each experiments, work backwards
+backwards | false | for each experiment, work backwards
 binarizeQuantile | [] | split HI LO at this quantile (between 0 and 0.5), mean if empty
-foldxval | 3 | if cross validation is used, this is the fold, default 3
+foldxval | 3 | if cross validation is used, this is the fold
 aggregateMode | majority | how to pool block predictions per patient, 'majority', 'mean' or 'max'
-saveTileTable | false | save a table for all tile predictions for viz
+saveTileTable | false | save a table for all tile predictions for visualization in QuPath
 tableModeClini | XLSX | file format of clinical table, XLSX or CSV
 hyper | default | set of hyperparameters, default, lowresource or verylowresource
 valSet | [] | validation set proportion of training set to stop training early
