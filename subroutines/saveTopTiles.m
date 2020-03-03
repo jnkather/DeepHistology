@@ -1,3 +1,11 @@
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
+% this function will identify and save images 
+% which are highly ranked by a neural network
+
 function saveTopTiles(stats,cnst,finalModel,imdsTST)
 
        disp('-- will start to save the top tiles');
@@ -6,13 +14,12 @@ function saveTopTiles(stats,cnst,finalModel,imdsTST)
            targetDir = fullfile('./output_blocks/',cnst.trainedModelID,'/',...
                cnst.ProjectName,'/',char(cellstr(finalModel.Layers(end).Classes(i))));
            mkdir(targetDir);
-           [uu,ui] = sort(stats.blockStats.Scores(:,i),'descend');
+           [~,ui] = sort(stats.blockStats.Scores(:,i),'descend');
            for j = 1:cnst.saveTopTiles
                montageData(:,:,:,j) = imread(char(imdsTST.Files(ui==j)));
-               %copyfile(sourceImage,targetDir);
+%               copyfile(sourceImage,targetDir);
            end
-           m = montage(montageData,'ThumbnailSize',[cnst.blocks.sizeOnImage,...
-               cnst.blocks.sizeOnImage]);
+           m = montage(montageData,'ThumbnailSize',[512, 512]);
            imwrite(m.CData,[targetDir,'/lastMontage_512.png']);
        end 
        

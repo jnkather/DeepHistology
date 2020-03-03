@@ -1,4 +1,8 @@
-% JN Kather 2019
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
 % this script will equalize the clases in an image datastore object so that
 % there is the same number of training instances for each label
 

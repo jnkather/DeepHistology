@@ -1,3 +1,11 @@
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
+% this is a general function similar to the 
+% transpose operator that works on structs 
+
 function structOut = transposeStruct(structIn)
 
 allNames = fieldnames(structIn);

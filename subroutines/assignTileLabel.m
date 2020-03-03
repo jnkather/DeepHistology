@@ -1,5 +1,10 @@
-% JN Kather 2019
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
 % this script will assign a label to each block (tile)
+% the label is inherited from the parent patient
 
 function [allBlocks,AnnData,unmatchedBlockNames] = assignTileLabel(allBlocks,AnnData,cnst)
 
@@ -15,11 +20,11 @@ function [allBlocks,AnnData,unmatchedBlockNames] = assignTileLabel(allBlocks,Ann
         dispOn = (mod(ci,round(numImages/5))==0); % display some results
         currImageName = AnnData.FILENAME{ci};
         matchingBlocks = contains(allBlockFileNames,currImageName);
-        if sum(matchingBlocks)>cnst.blocks.maxBlockNum
+        if sum(matchingBlocks)>cnst.maxBlockNum
             if dispOn
-            disp(['---- will remove ',num2str(sum(matchingBlocks)-cnst.blocks.maxBlockNum),' excess blocks']);
+            disp(['---- will remove ',num2str(sum(matchingBlocks)-cnst.maxBlockNum),' excess blocks']);
             end
-            matchingBlocks = removeExcessIndices(matchingBlocks,cnst.blocks.maxBlockNum);
+            matchingBlocks = removeExcessIndices(matchingBlocks,cnst.maxBlockNum);
         end
             if dispOn
             disp(['--- matched ',num2str(sum(matchingBlocks)),' blocks to ', currImageName]);

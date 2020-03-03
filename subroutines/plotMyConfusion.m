@@ -1,3 +1,10 @@
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
+% this auxiliary script can plot a confusion matrix
+
 % JN Kather 2018, plot confusion matrix for image classifier
 
 function plotMyConfusion(trueLabels,predictedLabels)

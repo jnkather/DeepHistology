@@ -1,4 +1,8 @@
-% JN Kather 2019
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
 % split image data store of blocks for cross validation
 
 function [imdsContainer,AnnData] = splitImdsForXVal(allBlocksLabeled,AnnData,cnst)
@@ -11,7 +15,17 @@ function [imdsContainer,AnnData] = splitImdsForXVal(allBlocksLabeled,AnnData,cns
         disp(['--- splitting label ',char(cellstr(ugroups(ui)))]);
         % locate all unique patients in the target group
         currUniqPats = unique(AnnData.PATIENT(AnnData.TARGET == ugroups(ui)));
-        ids = splitList(numel(currUniqPats),cnst.foldxval,ui);
+        % calculate the fraction of this group in the total cohort
+        currUniqPatsFraction = numel(currUniqPats)/numel(unique(AnnData.PATIENT));
+        disp(['-- the current group makes up ',num2str(currUniqPatsFraction),' of the total cohort']);
+        
+        if isfield(cnst,'patientsPerPartition') && ~isempty(cnst.patientsPerPartition)
+            disp('-- enforcing upper limit for # patients in partition (for learning curve)');
+            ids = splitListFixedNum(numel(currUniqPats),cnst.foldxval,ui, round(currUniqPatsFraction*cnst.patientsPerPartition));
+        else
+            disp('-- naive balanced splitting of patients in partitions (default behavior)');
+            ids = splitList(numel(currUniqPats),cnst.foldxval,ui);
+        end
         if isempty(ids)
             warning('split list failed... aborting');
             imdsContainer = [];

@@ -1,4 +1,10 @@
-% JN Kather 2019
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
+% this is a general auxiliary function to remove randomly
+% chosen entries from a list  
 
 function myBoolMatOut = removeExcessIndices(myBoolMat,numTrue)
     rng('default');
@@ -10,8 +16,7 @@ function myBoolMatOut = removeExcessIndices(myBoolMat,numTrue)
        myHits = myHits(randperm(numel(myHits))); % shuffle hits
        myBoolMatOut(myHits(1:numTrue)) = true; 
     else
-       warning('could not remove excess indices because there is no excess');
-       pause(1);
+       error('this should never happen (there is no excess)');
     end
 
 end

@@ -1,4 +1,11 @@
-% JN Kather 2019
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
+% this is used to do a GPU workaround on Ubuntu
+% which is caused by a CUDA problem. Not needed on 
+% Windows computers.
 
 function doGPUworkaround()
 

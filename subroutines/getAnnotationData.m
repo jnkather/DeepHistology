@@ -1,24 +1,26 @@
-% JN Kather 2019
-% this script will load CLINI and SLIDE table and will load them and match
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
+% this this script will load CLINI and SLIDE table and will load them and match
 % them up after performing a sanity test
 
 function tMERGE = getAnnotationData(cnst)
 
-   % define internal params
    % empty cells will be converted to 'x'
-   prm.removeTargets = categorical({'NA','NaN','N/A','na','n.a.','N.A.',...
-       'NotAvailable','undef','unknown','','x','NotApplicable','notperformed','NotPerformed',...
-       'Notassigned'});
+   prm.removeTargets = categorical(getDefaultDictionary('invalid_classes'));
    
    % read the clinical table and the slide table
    [tCLINI,tSLIDE] = readProjectTables(cnst);
    
    % optional: subset clinical table
-   if isfield(cnst,'subsetTargets')
+   if isfield(cnst,'subsetTargetsBy') && ~isempty(cnst.subsetTargetsBy)
        disp('-- will start subsetting of target table (assumes subset level is a string)');   
-       sanityCheck(any(strcmp(tCLINI.Properties.VariableNames,cnst.subsetTargets.by)),'target variable subset exists');
+       sanityCheck(any(strcmp(tCLINI.Properties.VariableNames,cnst.subsetTargetsBy)),'target subset exists');
+       sanityCheck(any(strcmp(unique(tCLINI.(cnst.subsetTargetsBy)),cnst.subsetTargetsLevel)),'level subset exists');
        disp(['--- before subsetting, there are ',num2str(size(tCLINI,1)),' entries in the CLINI table']);   
-       tCLINI(~strcmp(tCLINI.(cnst.subsetTargets.by),cnst.subsetTargets.level),:) = [];
+       tCLINI(~strcmp(tCLINI.(cnst.subsetTargetsBy),cnst.subsetTargetsLevel),:) = [];
        disp(['--- after subsetting, there are ',num2str(size(tCLINI,1)),' entries in the CLINI table']);     
    else
        disp('-- no subsetting of target table');
@@ -48,30 +50,37 @@ function tMERGE = getAnnotationData(cnst)
    tMERGE.FILENAME = tSLIDE.FILENAME;
    if isnumeric(tMERGE.FILENAME)
        tMERGE.FILENAME = cellstr(num2str(tMERGE.FILENAME));
+       disp('--- detected and fixed numerical FILENAME field');
    end
    tMERGE.PATIENT  = tSLIDE.PATIENT;
    if isnumeric(tMERGE.PATIENT)
        tMERGE.PATIENT = cellstr(num2str(tMERGE.PATIENT));
+       disp('--- detected and fixed numerical PATIENT field');
    end
    
    targetData = tCLINI.(cnst.annotation.targetCol);
-   if numel(unique(targetData))>5 % if there are many unique target levels check for numbers stored as string
+   % numerical targets with more than cnst.binarizeThresh levels will be 
+   % converted to "HI", "LO" and "UNDEF". 
+   
+   if isnumeric(targetData)
+       ulevels = numel(unique(targetData(~isnan(targetData))));
+   else
+       ulevels = numel(unique(targetData));
+   end
+   disp(['-- before binarization checkpoint, there are ',...
+       num2str(ulevels),' unique target levels']);
+   if ulevels>cnst.binarizeThresh % if there are many unique target levels check for numbers stored as string
        if isnumeric(targetData)
            disp(['--- detected NUMERICAL target with ',num2str(sum(isnan(targetData))),' NaNs']);
-           targetDataBinarized = double(targetData>=mean(targetData, 'omitnan'));
-            targetDataBinarized(isnan(targetData)) = NaN;
-            targetData = targetDataBinarized;
-           disp('--- converted continuous target to binary');
+           targetData = binarizeNumerical(targetData,cnst.binarizeQuantile); 
+           disp('--- converted continuous numerical target to binary string');
        else
-           disp('--- detected NON-NUMERICAL target... will try to convert to numerial');
+           disp('--- detected suspicious NON-NUMERICAL target... will try to convert to numerial');
            try
            targetData = cellfun(@str2double,targetData);
            if sum(isnan(targetData))<numel(targetData) % if conversion worked
-               disp('---- conversion worked!');
-               removeMe = isnan(targetData);
-               targetData = strrep(strrep(cellstr(num2str(double(targetData>=mean(targetData, 'omitnan')))),'0','LO'),'1','HI');
-               targetData(removeMe) = {'undef'};
-               disp('--- numerized and then converted continuous target to binary');  
+               targetData = binarizeNumerical(targetData,cnst.binarizeQuantile);
+               disp('--- numerized and then converted continuous numerical target to binary string');  
            else
                warning('--- conversion to numerical did not work, falling back.');
                targetData = tCLINI.(cnst.annotation.targetCol);

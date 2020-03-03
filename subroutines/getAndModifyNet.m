@@ -1,4 +1,11 @@
-% JN Kather 2018
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
+% this function will load a pre-trained deep neural network
+% in matlab and modify it for the histology task at hand
+
 
 function pretrainedModel = ...
     getAndModifyNet(cnst,hyperprm,numOutputClasses)
@@ -64,11 +71,31 @@ switch lower(cnst.modelTemplate)
         rawnet = shufflenet512;
         layersForRemoval = {'node_202', 'node_203','ClassificationLayer_node_203'};
         layersForReconnection = {'node_200','fc'};
+    case 'shufflenet256' % modified shufflenet with 512x512x3 input layer
+        load('./networks/shufflenet256.mat','shufflenet256');
+        rawnet = shufflenet256;
+        layersForRemoval = {'node_202', 'node_203','ClassificationLayer_node_203'};
+        layersForReconnection = {'node_200','fc'};
+    case 'shufflenet196' % modified shufflenet with 512x512x3 input layer
+        load('./networks/shufflenet196.mat','shufflenet196');
+        rawnet = shufflenet196;
+        layersForRemoval = {'node_202', 'node_203','ClassificationLayer_node_203'};
+        layersForReconnection = {'node_200','fc'};
     case 'densenet512' % modified densenet with 512x512x3 input layer
         load('./networks/densenet512.mat','densenet512');
         rawnet = densenet512;
         layersForRemoval = {'fc1000','fc1000_softmax','ClassificationLayer_fc1000'};
         layersForReconnection = {'avg_pool','fc'};
+    case 'resnet18_512' % modified densenet with 512x512x3 input layer
+        load('./networks/resnet18_512.mat','resnet18_512');
+        rawnet = resnet18_512;
+        layersForRemoval = {'fc1000', 'prob','ClassificationLayer_predictions'};
+        layersForReconnection = {'pool5','fc'};
+    case 'mobilenetv2_512' % modified densenet with 512x512x3 input layer
+        load('./networks/mobilenetv2_512.mat','mobilenetv2_512');
+        rawnet = mobilenetv2_512;
+        layersForRemoval = {'Logits', 'Logits_softmax','ClassificationLayer_Logits'};
+        layersForReconnection = {'global_average_pooling2d_1','fc'};
     otherwise
         error('wrong network model specified');
 end
@@ -91,8 +118,13 @@ switch char(class(rawnet))
         lgraph = layerGraph(rawnet); % convert network to layer graph
         layers = lgraph.Layers;      % extract layers
         connections = lgraph.Connections; % exctract connections
-        freezeIndex = 1:(numel(layers)-hyperprm.hotLayers);
-        layers(freezeIndex) = freezeWeights(layers(freezeIndex));
+        if ~isempty(hyperprm.hotLayers)
+            disp('-- freezing network layers');
+            freezeIndex = 1:(numel(layers)-hyperprm.hotLayers);
+            layers(freezeIndex) = freezeWeights(layers(freezeIndex));
+        else
+            disp('-- not freezing network layers');
+        end
         lgraph = createLgraphUsingConnections(layers,connections);
         % remove old layers
         lgraph = removeLayers(lgraph,layersForRemoval);

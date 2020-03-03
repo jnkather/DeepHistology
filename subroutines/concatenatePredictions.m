@@ -1,3 +1,11 @@
+% JN Kather 2018-2020
+% This is part of the DeepHistology repository
+% License: see separate LICENSE file 
+% 
+% documentation for this function:
+% this function will concatenate predictions in a cross-
+% validated experiment 
+
 function outStats = concatenatePredictions(stats)
 
 if numel(stats) == 1
