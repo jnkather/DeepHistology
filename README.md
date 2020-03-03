@@ -1,5 +1,13 @@
 # DeepHistology
-A pan-cancer platform for mutation prediction from routine histology. This project has been submitted to a peer-reviewed journal.
+A pan-cancer platform for mutation prediction from routine histology by the Kather lab (http://kather.ai). This is implemented in MATLAB and requires version R2019a+ (for some visualizations, R2019b+).
+
+The data preprocessing workflow ("the Aachen protocol") is described here: https://zenodo.org/record/3694994 
+
+Briefly, to use these scripts, you should
+1. prepare your data according to the Aachen protocol
+2. prepare an "experiment file" which specifies the name of the project, the location of the tiles and the targets to be predicted
+3. run autoDeepLearn('experiment','<your experiment name>') to run a cross-validated experiment
+4. visualize the results with autoVisualize('experiment','<your experiment name>')
 
 ## Main scripts and their input arguments
 
