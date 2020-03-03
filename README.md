@@ -1,7 +1,7 @@
 # DeepHistology
 A pan-cancer platform for mutation prediction from routine histology by the Kather lab (http://kather.ai). This is implemented in MATLAB and requires version R2019a+ (for some visualizations, R2019b+).
 
-![Fig1][figure1.jpg]
+![Fig1](figure1.jpg)
 
 Briefly, to use these scripts, you should
 1. prepare your data according to the Aachen protocol as described here: https://zenodo.org/record/3694994 
