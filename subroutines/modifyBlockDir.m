@@ -27,8 +27,7 @@ disp('-- will modify block directory (load non-standard set of blocks=tiles)');
                     '(manually outlined luminal approx 2 mm region)']);
                 outdir = fullfile(basedir,'/BLOCKS-BIOPSY/');                
             case 'NORMALIZED'
-                disp(['--- will only load NORMALIZED blocks',newline,...
-                    '(Macenko procedure)']);
+                disp(['--- will only load NORMALIZED blocks',newline]);
                 outdir = fullfile(basedir,'/BLOCKS_NORM/');       
             otherwise
                 error('this is not implemented');

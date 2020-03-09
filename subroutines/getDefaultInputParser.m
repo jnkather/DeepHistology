@@ -49,6 +49,9 @@ function p = getDefaultInputParser(myVargs)
     addParameter(p,'plotAUCthreshold',0.75,@isnumeric); % detailed visualization only for high performance targets
     addParameter(p,'onlyExplicitTargets',true,@islogical); % visualize only targets specified in experiment file
     addParameter(p,'debugMode',false,@islogical); % debug mode
+    
+    %% normalization of tiles (blocks)
+    addParameter(p,'numParWorkers',0,@isnumeric); % default: do not use parallel workers
        
     parse(p,myVargs{:});        % parse input arguments
 end

@@ -14,6 +14,13 @@ disp(['loading blocks for project ',cnst.ProjectName]);
 % (cnst.folderName.Blocks is a cell with multiple elements)
 fileCollection.Blocks = imageDatastore(cnst.folderName.Blocks, ... 
         'IncludeSubfolders',true,'FileExtensions',cnst.fileformatBlocks,'LabelSource','foldernames'); 
-fileCollection.Blocks.Labels = repmat(categorical({'NA'}),numel(fileCollection.Blocks.Labels),1); % remove labels
+    
+if cnst.debugMode
+    disp('--- will not reset block labels for debug purposes');
+else
+    disp('--- resetting block labels');
+    fileCollection.Blocks.Labels = repmat(categorical({'NA'}),numel(fileCollection.Blocks.Labels),1); % remove labels
+end
+
 disp(['I found ',num2str(numel(fileCollection.Blocks.Files)),' blocks (=tiles)']);
 end

@@ -1,5 +1,5 @@
 # DeepHistology
-A pan-cancer platform for mutation prediction from routine histology by the Kather lab (http://kather.ai). This is implemented in MATLAB and requires version R2019a+ (for some visualizations, R2019b+).
+A pan-cancer platform for mutation prediction from routine histology by the Kather lab (http://kather.ai). This is implemented in MATLAB and requires version R2019a+ (for some visualizations, R2019b+). The following Matlab toolboxes are required: Image processing toolbox, Deep learning toolbox, Parallel processing toolbox.
 
 ![Fig1](figure1.jpg)
 
@@ -19,22 +19,24 @@ An example for a possible data structure (project TCGA-CRC-DX) is:
 
 ### autoDeepLearn
 
+This is the main function for training networks and to evaluate networks via cross-validation. 
+
 Argument | Default Value | Description
 --- | --- | ---
 experiment | '' |  which experiment to load
 gpuDev     | 1 | GPU Device (1 or greater)
 maxBlockNum | 1000 | number of  (tiles) per whole slide image
 trainFull | false | train on full dataset after xval
-modelTemplate | shufflenet512 | which pretrained model
-backwards | false | for each experiment, work backwards
-binarizeQuantile | [] | split HI LO at this quantile (between 0 and 0.5), mean if empty
-foldxval | 3 | if cross validation is used, this is the fold
-aggregateMode | majority | how to pool block predictions per patient, 'majority', 'mean' or 'max'
+modelTemplate | shufflenet512 | which pretrained model, possible options are defined in getAndModifyNet()
+backwards | false | for each experiment, work backwards in the list of targets
+binarizeQuantile | [] | split high/low at this quantile, possible options: floating point number between 0 and 0.5 or empty (use mean)
+foldxval | 3 | if cross validation is used, this is the fold, possible option: any positive integer. If this is 0, no cross validation will be done. 
+aggregateMode | majority | how to pool block predictions per patient, possible otions: 'majority', 'mean' or 'max'
 saveTileTable | false | save a table for all tile predictions for visualization in QuPath
 tableModeClini | XLSX | file format of clinical table, XLSX or CSV
-hyper | default | set of hyperparameters, default, lowresource or verylowresource
+hyper | default | set of hyperparameters as defined in getDeepHyperparameters(), possible options: default, lowresource or verylowresource
 valSet | [] | validation set proportion of training set to stop training early
-filterBlocks |  | can be NORMALIZED or STROMA or TUMOR for specific training tasks
+filterBlocks |  | can be 'normalized' or 'stroma' or 'tumor' for specific training tasks. Default: empty.
 subsetTargetsBy | [] | subset the patients by a variable
 subsetTargetsLevel | [] | subset the patients by this level in the variable
 skipExistingTargets | false |  skip target prediction if result file exists
@@ -42,12 +44,16 @@ forgiveError | false | ignore errors during training and go on to the next task
 
 ### autoDeploy
 
+This function will use a trained network and allows to deploy it on a different patient cohort. 
+
 Argument | Default Value | Description
 --- | --- | ---
 trainedModelID | [] | use a previously trained model for deployment
 trainedModelFolder | [] |  path to previously trained model for deployment
     
 ### autoVisualize
+
+This function will load results from the 'DUMP' folder and create plots.
 
 Argument | Default Value | Description
 --- | --- | ---
@@ -64,4 +70,4 @@ onlyExplicitTargets | true |  visualize only targets specified in experiment fil
 debugMode | false |  debug mode
 
 ## License
-See separate License file which applies to all files within this repository unless noted otherwise. Please note that some functions in the subroutine folder are from third party sources and have their own license included in the file.
+See separate License file which applies to all files within this repository unless noted otherwise. Please note that some functions in the subroutine folder are from third party sources and have their own license included in the file. 
