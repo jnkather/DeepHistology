@@ -61,6 +61,23 @@ elseif contains(myList{1},'_(')
 %            end
 %         end
 %     end
+elseif contains(myList{1},'_')
+    
+% THIS IS for blocks that have been produced at UChicago
+% have the syntax <IMAGE>_<REST>    
+
+    disp('-- auto detected block syntax <IMAGE>_<REST>');
+    
+    for i=1:maxList
+        [~,myList{i},~] = fileparts(myList{i}); % remove path and suffix
+        blk = strfind(myList{i},'_');
+        myList{i} = myList{i}(1:(blk(1)-1)); 
+       if mod(i,round(maxList/5))==0
+        disp(['this block belongs to image ',...
+            char(myList{i}),' parsed ',num2str(round(i/maxList*100)),'%']);
+        end
+    end
+    
 else
 
 % THIS IS for blocks that have been produced with the matlab script and

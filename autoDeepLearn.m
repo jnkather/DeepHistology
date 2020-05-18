@@ -76,7 +76,17 @@ for ti = 1:numel(cnst.allTargets) % iterate target variables in this experiment
                     imdsTRN = equalizeClasses(imdsTRN); % undersample training set
                     disp(['---- after undersampling, there are ',num2str(numel(imdsTRN.Files)),' tiles in the training set']);
                 end
-                [~,partitionPredictions{ir}] = trainMyNetwork(myNet,imdsTRN,imdsTST,cnst,hyperprm);  
+                % optional: export tiles of first xval run
+                if ir==1 && isfield(cnst,'exportTiles') && cnst.exportTiles 
+                    exportTiles(cnst,imdsTRN,imdsTST);
+                end
+                % train the network
+                [~,partitionPredictions{ir}] = trainMyNetwork(myNet,imdsTRN,imdsTST,cnst,hyperprm);
+                % if holdout mode is active, then stop xval after 1st run
+                if ir == 1 && isfield(cnst,'xvalmode') && strcmp(cnst.xvalmode,'holdout')
+                    disp('-- train in holdout mode = use only first xval run');
+                    break
+                end
             end
             % combine stats
             resultCollection.blockStats   = concatenatePredictions(partitionPredictions);
@@ -88,7 +98,8 @@ for ti = 1:numel(cnst.allTargets) % iterate target variables in this experiment
         end
         if cnst.trainFull % re-train on the full image set for deployment
             disp('training on full set for external validation');
-            [finalModel,~] = trainMyNetwork(myNet,equalizeClasses(allBlocks),[],cnst,hyperprm);   
+            trainFullTrainingSet = equalizeClasses(allBlocks);
+            [finalModel,~] = trainMyNetwork(myNet,trainFullTrainingSet,[],cnst,hyperprm);   
         end
         totalTime = toc(z1);
         if isempty(resultCollection)
@@ -98,21 +109,21 @@ for ti = 1:numel(cnst.allTargets) % iterate target variables in this experiment
             resultCollection.cnst = cnst;
             resultCollection.hyperprm = hyperprm;
             resultCollection.totalTime = totalTime;
-            save(fullfile(cnst.folderName.Dump,[cnst.experimentName,'_lastResult_v6.mat']),'resultCollection');
+            save(fullfile(cnst.folderName.Dump,[cnst.experimentName,'_lastResult_',cnst.saveFormat,'.mat']),'resultCollection');
             if cnst.trainFull
-                save(fullfile(cnst.folderName.Dump,[cnst.experimentName,'_lastModel_v6.mat']),'finalModel'); 
+                save(fullfile(cnst.folderName.Dump,[cnst.experimentName,'_lastModel_',cnst.saveFormat,'.mat']),'finalModel'); 
             end
         end
     end
+    
+    catch exception % catch errors during training and stop or forgive
+       if isfield(cnst,'forgiveError') && cnst.forgiveError
+           warning('TRAINING FAILED, forgiving error');
+       else
+           rethrow(exception); % rethrow the error
+       end
+    end
+    
     clear resultCollection allBlocksLabeled AnnData finalModel % clean up
-    catch
-        warning('TRAINING FAILED');
-        if isfield(cnst,'forgiveError') && cnst.forgiveError
-            disp('will continue');
-            clear resultCollection allBlocksLabeled AnnData finalModel % clean up
-        else
-            error('stopping training');
-        end
-    end
-    end
+end
 end

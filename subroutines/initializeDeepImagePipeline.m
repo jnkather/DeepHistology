@@ -28,7 +28,8 @@ if isa(cnst.ProjectName,'cell') && numel(cnst.ProjectName)>1 % multi cohorts
         disp(['-- adding block folder of cohort: ',cnst.allProjects{i}]);
         if isfield(cnst,'filterBlocks') && ~isempty(cnst.filterBlocks) && ~strcmp(cnst.filterBlocks,'') % non-standard block dir
             disp('-- will modify experiment name to account for non-standard block dir');
-            cnst.experimentName = [cnst.experimentName,'-',cnst.filterBlocks];
+            cnst.experimentName = matlab.lang.makeValidName(...
+                [cnst.experimentName,'-',cnst.filterBlocks]);
             cnst.folderName.Blocks{i} = modifyBlockDir(cnst,fullfile(cnst.folderName.Temp,cnst.allProjects{i})); % abs. path to block save folder
         else % standard block dir
             disp('-- load blocks from standard block dir');
@@ -39,16 +40,17 @@ else % standard single cohort
     cnst.multipleCohorts = false;
     disp('-- preparing single cohort');
     
-    % check for subset tile folder (e.g. stroma only)
+    % check for subset tile folder (e.g. stroma only; defined on command line)
     if isfield(cnst,'filterBlocks') && ~isempty(cnst.filterBlocks) && ~strcmp(cnst.filterBlocks,'') % non-standard block dir
         disp('-- will modify experiment name to account for non-standard block dir');
-        cnst.experimentName = [cnst.experimentName,'-',cnst.filterBlocks];
+        cnst.experimentName = matlab.lang.makeValidName(...
+            [cnst.experimentName,'-',cnst.filterBlocks]);
         cnst.folderName.Blocks = modifyBlockDir(cnst,fullfile(cnst.folderName.Temp,cnst.ProjectName));  % abs. path to block save folder
     else % standard block dir
         cnst.folderName.Blocks = fullfile(cnst.folderName.Temp,cnst.ProjectName,'/BLOCKS/');  % abs. path to block save folder
     end
     
-    % check for overridden tile folder
+    % check for overridden tile folder (defined in experiment file)
     if isfield(cnst,'overrideFolder') && ~isempty(cnst.overrideFolder)
         disp(['-- manual OVERRIDE of tile (blocks) folder from [',cnst.ProjectName,...
              '] to [',cnst.overrideFolder,'] /BLOCKS/']);

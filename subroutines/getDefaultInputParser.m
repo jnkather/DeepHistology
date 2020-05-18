@@ -12,6 +12,9 @@ function p = getDefaultInputParser(myVargs)
     p.PartialMatching = false;  % strict input parser options
     p.KeepUnmatched = false;    % strict input parser options
     
+    %% general parameters
+    addParameter(p,'saveFormat','v6',@ischar); % version of results file    
+    
     %% training of deep learning models
     addParameter(p,'experiment','',@ischar);   % which experiment to load
     addParameter(p,'gpuDev',1,@isnumeric);         % GPU Device (1 or greater)
@@ -21,16 +24,27 @@ function p = getDefaultInputParser(myVargs)
     addParameter(p,'backwards',false,@islogical); % for each experiments, work backwards
     addParameter(p,'binarizeQuantile',[]); % split HI LO at this quantile (between 0 and 0.5)
     addParameter(p,'foldxval',3,@isnumeric); % if cross validation is used, this is the fold, default 3
+    addParameter(p,'xvalmode','xval',@ischar); % can be 'xval' or 'holdout' (= only first run)
     addParameter(p,'aggregateMode','majority',@ischar); % how to pool block predictions per patient, 'majority', 'mean' or 'max'
     addParameter(p,'saveTileTable',false,@islogical); % save a table for all tile predictions for viz
     addParameter(p,'tableModeClini','XLSX',@ischar); % file format of clinical table, XLSX or CSV
     addParameter(p,'hyper','default',@ischar); % set of hyperparameters
     addParameter(p,'valSet',[],@isnumeric); % validation set proportion of training set, default no validation (recommend 0.05)
-    addParameter(p,'filterBlocks','',@ischar); %
+    addParameter(p,'filterBlocks','',@ischar); % use an alternative set of tiles, such as normalized tiles
     addParameter(p,'subsetTargetsBy',[]); % subset the patients by a variable
     addParameter(p,'subsetTargetsLevel',[]); % subset the patients by this level in the variable
     addParameter(p,'skipExistingTargets',false,@islogical); % skip target prediction if result file exists
     addParameter(p,'forgiveError',false,@islogical); % ignore errors during training and go on to the next task
+    
+    % holy input parameters, do not change
+    addParameter(p,'saveUnmatchedBlocks',false,@islogical);   % save list of unmatchable blocks, may blow up output file size
+    addParameter(p,'nBootstrapAUC',10,@isnumeric);   % bootstrap for AUC confidence interval, default 10
+    addParameter(p,'undersampleTrainingSet',true,@islogical); % equalize training set just before training
+    addParameter(p,'binarizeThresh',5,@isnumeric);    % convert num targets with more than N levels to HI / LO
+    addParameter(p,'fileformatBlocks','.jpg',@ischar);  % define format for Blocks
+    
+    % experimental parameters, do not change in production mode
+    addParameter(p,'exportTiles',false,@islogical); % export tiles of first 'xval' experiment just before training
     
     %% deployment of pre-trained models
     addParameter(p,'trainedModelID',[]); % use a previously trained model for deployment
@@ -45,11 +59,18 @@ function p = getDefaultInputParser(myVargs)
     addParameter(p,'exportTopTiles',0,@isnumeric); % save showcase tiles 
     addParameter(p,'topPatients',3,@isnumeric); % showcase tiles from these patients
     addParameter(p,'plotFontSize',12,@isnumeric); % font size for plots    
-    addParameter(p,'saveFormat','v6',@ischar); % version of results file    
     addParameter(p,'plotAUCthreshold',0.75,@isnumeric); % detailed visualization only for high performance targets
     addParameter(p,'onlyExplicitTargets',true,@islogical); % visualize only targets specified in experiment file
     addParameter(p,'debugMode',false,@islogical); % debug mode
     
+    %% fixed visualization parameters, do not change
+    addParameter(p,'axTicks',0:0.2:1);     % primary axis tick labels for ROC curves
+    addParameter(p,'axTicksFine',0:0.1:1); % secondary axis tick labels for ROC curves
+    addParameter(p,'scaleYprerec',false,@islogical); % scale y axis of pre rec curve, default false
+
+    %% train on previously exported dataset
+    addParameter(p,'trainOnFolder','',@ischar); % scale y axis of pre rec curve, default false
+
     %% normalization of tiles (blocks)
     addParameter(p,'numParWorkers',0,@isnumeric); % default: do not use parallel workers
        

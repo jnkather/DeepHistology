@@ -10,15 +10,15 @@
 function cnst = loadExperiment(codename)
 
     try % load source data
-        currentData = fileread(fullfile('./experiments/',[lower(codename),'.txt']));
+        currentData = fileread(fullfile('./experiments/',[codename,'.txt']));
     catch
-        error(['did not find this source file: ',[lower(codename),'.txt']]);
+        error(['did not find this source file: ',codename]);
     end
 
     try % decode data and dump to cnst (thereby overwriting previous params)
         cnst = jsondecode(currentData); 
     catch
-        error(['could not decode source data for: ',[lower(codename),'.txt']]);
+        error(['could not decode source data for: ',codename]);
     end   
 
     % ensure consistent file names
@@ -27,22 +27,16 @@ function cnst = loadExperiment(codename)
     % create random experiment ID
     rng('shuffle');
     cnst.experimentName = randseq(12,'Alphabet','AA');
-    disp(['--- this is the current experiment name: ',cnst.experimentName]);
+    disp(['--- this is the unique experiment name: ',cnst.experimentName]);
 
-    % save code name
-    cnst.codenameFile = cnst.codename;
+    % save file name as codename
     cnst.codename = codename;
 
     % output status
-    disp(['successfully loaded source file: ',[lower(codename),'.txt']]);
-    
-    % add some holy default settings
-    cnst.saveUnmatchedBlocks = false;   % save list of unmatchable blocks, may blow up output file size
-    cnst.nBootstrapAUC          = 10;   % bootstrap for AUC confidence interval, default 10
-    cnst.undersampleTrainingSet = true; % equalize training set labels by undersampling
-    cnst.binarizeThresh         = 5;    % convert num targets with more than N levels to HI / LO
+    disp(['successfully loaded source file: ',codename]);
+
+    % add holy parameters, do not change
     cnst.blocks.resizeMethod = 'resize';      % how to make the blocks fit the neural network input size
                                               % options: 'resize', 'randcrop', 'centercrop'; default 'resize'
-    cnst.fileformatBlocks ='.jpg';  % define format for Blocks
 
 end

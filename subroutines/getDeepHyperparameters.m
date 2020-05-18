@@ -29,6 +29,8 @@ disp(['- loading hyperparameter set: ',paramset]);
 switch lower(paramset)
     case 'default'
         disp('-- no hyperparam modification needed');
+    case 'hyper' % use max. VRAM
+        hyperprm.MiniBatchSize = 1024;
     case 'flexi'
         disp('-- enabled flexible learning (40 hot layers) & long training (careful, overfitting!)');
         hyperprm.hotLayers = 40;

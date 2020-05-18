@@ -8,9 +8,12 @@
 
 function outStats = concatenatePredictions(stats)
 
-if numel(stats) == 1
+if numel(stats) == 1 && isstruct(stats)
     disp('-- there is only one partition, containing the full stats (no crossval)');
     outStats = stats.blockStats;
+elseif numel(stats) == 1 && iscell(stats)
+    disp('-- there is only one full partition in a multi-partition struct');
+    outStats = stats{1}.blockStats;
 else
     disp('-- stats from multiple partitions will be concatenated');
     for i = 1:numel(stats) % iterate test sets from each crossval experiment and merge

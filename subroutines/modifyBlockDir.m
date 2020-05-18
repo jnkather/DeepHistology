@@ -30,7 +30,8 @@ disp('-- will modify block directory (load non-standard set of blocks=tiles)');
                 disp(['--- will only load NORMALIZED blocks',newline]);
                 outdir = fullfile(basedir,'/BLOCKS_NORM/');       
             otherwise
-                error('this is not implemented');
+                disp(['trying to set non-standard alternative block dir: ',newline]);
+                outdir = fullfile(basedir,cnst.filterBlocks);
+                disp(outdir);
         end
-        
 end

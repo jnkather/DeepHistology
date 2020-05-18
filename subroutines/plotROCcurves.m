@@ -100,7 +100,13 @@ function resultCollection = plotROCcurves(resultCollection,cnst,currE)
                 subplot(2,numel(allvars),ja+numel(allvars))
                 %nexttile
                 % calculate the prevalence of this level
-                prevalence = resultCollection.patientStats.nPats.(allvars{ja})/sum(struct2array(resultCollection.patientStats.nPats));
+                try
+                    prevalence = resultCollection.patientStats.nPats.(allvars{ja})/sum(struct2array(resultCollection.patientStats.nPats));
+                catch
+                    warning('struct2array bug... workaround...');
+                    struct2array = @(temp) myStruct2array(temp);  
+                    prevalence = resultCollection.patientStats.nPats.(allvars{ja})/sum(struct2array(resultCollection.patientStats.nPats));
+                end
                 
                 hold on
                 X = resultCollection.patientStats.PRE_REC.Plot.X.(allvars{ja});

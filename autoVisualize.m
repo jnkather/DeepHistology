@@ -23,9 +23,6 @@ sq = @(varargin) varargin';
 allnames = sq(allfiles.name);
 
 % additional hard-coded settings, do not change
-cnst.axTicks = 0:0.2:1;     % primary axis tick labels for ROC curves
-cnst.axTicksFine = 0:0.1:1; % secondary axis tick labels for ROC curves
-cnst.scaleYprerec = false; % scale y axis of pre rec curve, default false
 cnst.plotSpec = false; % display specificity at fixed sens levels
 cnst.firstAsLargePlot = false; % plot first ROC curve as large plot
 cnst.plotGoldStandardMSI = false; %plot the literature Gold standard

@@ -11,7 +11,7 @@ function outputSummary = deployModelBlind(hyperprm,finalModel,allBlocksLabeled)
   test_AUG = augmentedImageDatastore(finalModel.Layers(1).InputSize(1:2),allBlocksLabeled); 
   disp('starting prediction...');
   test_AUG.MiniBatchSize = hyperprm.MiniBatchSize;
-  aa = activations(finalModel,test_AUG,'classoutput','ExecutionEnvironment','gpu');
+  %aa = activations(finalModel,test_AUG,'classoutput','ExecutionEnvironment','gpu');
   
   [stats.blockStats.PLabels,stats.blockStats.Scores] = classify(finalModel, ...
             test_AUG, 'ExecutionEnvironment',hyperprm.ExecutionEnvironment);
