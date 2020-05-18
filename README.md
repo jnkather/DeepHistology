@@ -79,3 +79,6 @@ debugMode | false |  debug mode
 
 ## License
 See separate License file which applies to all files within this repository unless noted otherwise. Please note that some functions in the subroutine folder are from third party sources and have their own license included in the file. 
+
+## Questions?
+Get in touch at https://jnkather.github.io/contact/
