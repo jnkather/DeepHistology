@@ -1,5 +1,5 @@
 # DeepHistology
-A pan-cancer platform for mutation prediction from routine histology by the Kather lab (http://kather.ai). This is implemented in MATLAB and requires version R2019a+ (for some visualizations, R2019b+). The following Matlab toolboxes are required: Image processing toolbox, Deep learning toolbox, Parallel processing toolbox.
+This is a pan-cancer platform for mutation prediction from routine histology by the Kather lab (http://kather.ai). It is implemented in MATLAB and requires version R2019a+ (for some types of visualization, R2019b+). The following Matlab toolboxes are required: Image processing toolbox, Deep learning toolbox, Parallel processing toolbox.
 
 ![Fig1](figure1.jpg)
 
@@ -14,6 +14,14 @@ An example for a possible data structure (project TCGA-CRC-DX) is:
 - CLINI table 'TCGA-CRC-DX_CLINI.xlsx' is located in './cliniData' and has a column called PATIENT
 - SLIDE table 'TCGA-CRC-DX_SLIDE.csv' is located in './cliniData' and has a column called PATIENT and a column called FILENAME
 - image tiles were generated with QuPath, are named according to the Aachen protocol and are located at 'E:/TCGA-CRC-DX/BLOCKS/' 
+
+## Releases
+
+This project is constantly evolving and is being updated regularly. To reproduce our previous research findings, you can use "frozen" releases of the code. 
+
+- v0.2 was used for the project "Pan-cancer image-based detection of clinically actionable genetic alterations"
+
+more info: https://github.com/jnkather/DeepHistology/releases 
 
 ## Main scripts and their input arguments
 
