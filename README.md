@@ -77,6 +77,16 @@ plotAUCthreshold | 0.75 |  detailed visualization only for high performance targ
 onlyExplicitTargets | true |  visualize only targets specified in experiment file
 debugMode | false |  debug mode
 
+### autoNormalize
+
+This function will normalize tile images with the Macenko method. Caution: This function relies on third party subroutines in "./subroutines_normalization" - please observe the third party license in that sub-folder.
+
+Argument | Default Value | Description
+--- | --- | ---
+experiment | '' | name of the experiment file
+numParWorkers | 1 |  number of parallel CPUs (requires Parallel Processing Toolbox)
+
+
 ## License
 See separate License file which applies to all files within this repository unless noted otherwise. Please note that some functions in the subroutine folder are from third party sources and have their own license included in the file. 
 
