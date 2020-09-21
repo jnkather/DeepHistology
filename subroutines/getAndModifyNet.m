@@ -81,6 +81,10 @@ switch lower(cnst.modelTemplate)
         rawnet = shufflenet196;
         layersForRemoval = {'node_202', 'node_203','ClassificationLayer_node_203'};
         layersForReconnection = {'node_200','fc'};
+   case 'densenet' % original densenet 201
+        rawnet = densenet201;
+        layersForRemoval = {'fc1000','fc1000_softmax','ClassificationLayer_fc1000'};
+        layersForReconnection = {'avg_pool','fc'};
     case 'densenet512' % modified densenet with 512x512x3 input layer
         load('./networks/densenet512.mat','densenet512');
         rawnet = densenet512;
@@ -91,7 +95,11 @@ switch lower(cnst.modelTemplate)
         rawnet = resnet18_512;
         layersForRemoval = {'fc1000', 'prob','ClassificationLayer_predictions'};
         layersForReconnection = {'pool5','fc'};
-    case 'mobilenetv2_512' % modified densenet with 512x512x3 input layer
+    case 'mobilenetv2' % original mobile net
+        rawnet = mobilenetv2;
+        layersForRemoval = {'Logits', 'Logits_softmax','ClassificationLayer_Logits'};
+        layersForReconnection = {'global_average_pooling2d_1','fc'};
+    case 'mobilenetv2_512' % modified mobilenet with 512x512x3 input layer
         load('./networks/mobilenetv2_512.mat','mobilenetv2_512');
         rawnet = mobilenetv2_512;
         layersForRemoval = {'Logits', 'Logits_softmax','ClassificationLayer_Logits'};

@@ -64,12 +64,14 @@ disp(['displaying result for ',char(currE)]);
         end
 
         % plot ROC curves
-        if cnst.doPlot && ~isempty(resultCollection.patientStats)
+        if cnst.doPlot && isfield(resultCollection,'patientStats') && ...
+                ~isempty(resultCollection.patientStats)
            resultCollection = plotROCcurves(resultCollection,cnst,currE);
         end
             
         % extract performance and save to results
-        if ~isempty(resultCollection.patientStats)
+        if isfield(resultCollection,'patientStats') && ...
+                ~isempty(resultCollection.patientStats)
     	res = parseStatistics(resultCollection);
         
         allVars = res.outT.Properties.VariableNames;
@@ -123,9 +125,17 @@ disp(['displaying result for ',char(currE)]);
             allScores = resultCollection.blockStats.Scores;
             blockOutTable = [table(blockNames),array2table(allScores)];
             blockOutTable.Properties.VariableNames = [{'blockName'},fieldnames(resultCollection.patientStats.rawData.predictions)'];
-            writetable(blockOutTable,...
-                fullfile(cnst.folderName.Dump,[char(currE),'-',currTarget,'-blockLevelPredictions.csv']),...
-                'Delimiter',';');
+            switch lower(cnst.exportBlockFormat)
+                case 'csv'
+                writetable(blockOutTable,...
+                    fullfile(cnst.folderName.Dump,[char(currE),'-',currTarget,'-blockLevelPredictions.csv']),...
+                    'Delimiter',';');
+                case 'xlsx'
+                writetable(blockOutTable,...
+                    fullfile(cnst.folderName.Dump,[char(currE),'-',currTarget,'-blockLevelPredictions.xlsx'])); 
+                otherwise
+                    error('wrong format for exporting block prediction table');
+            end
         end
         
             % optional: export the highest scoring tiles
@@ -151,16 +161,29 @@ disp('============================================================');
 end
                 
 % summarize results, perform Benjamini-Hochberg FDR correction
-if isfield(summary,'pVal')
+if exist('summary','var') && isfield(summary,'pVal')
     summary.fdrPval = mafdr(cell2mat(summary.pVal),'BHFDR',true);
 else
     summary.fdrPval = [];
 end
 
 myT = struct2table(transposeStruct(summary)) %#ok
+
+% optional: plot forest plot
+if cnst.plotForest
+   figure
+   if ~isempty(cnst.forestLevels)
+       flt = strcmp(myT.levelNames,cnst.forestLevels);
+   else
+       flt = true(size(myT.levelNames));
+   end
+   IDs = strrep(strcat(myT.project,{' '},myT.varN,{' '},myT.levelNames,{' p='},num2str(myT.fdrPval,2)),'_','-');
+   forest(IDs(flt),myT.AUROC_avg(flt),myT.AUROC_low(flt),myT.AUROC_hig(flt),cnst.codename,10);
+end
+
 writetable(myT,['./output_tables/',...
      cnst.codename,'_',strrep(char(datetime),':','-'),'_lastTable.xlsx']);
-
+ 
  if cnst.debugMode
     disp('-- sparse patients for review:');
     disp(unique(collectSparsePatients));

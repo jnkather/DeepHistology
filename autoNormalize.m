@@ -21,9 +21,15 @@ cnst = copyfields(cnst,iPrs.Results,fieldnames(iPrs.Results)); % apply input
 warning ('on','all');
 ref_image = imread('./subroutines_normalization/Ref.png'); % reference image for image color normalization
 
+if ~isfield(cnst,'overrideFolder') || isempty(cnst.overrideFolder) % this is the default
 cnst.folderName.BlocksNorm = strrep(cnst.folderName.Blocks,fullfile(cnst.ProjectName,'BLOCKS'),fullfile(cnst.ProjectName,'BLOCKS_NORM'));
 cnst.folderName.BlocksFail = strrep(cnst.folderName.Blocks,fullfile(cnst.ProjectName,'BLOCKS'),fullfile(cnst.ProjectName,'BLOCKS_NORM_FAIL'));
+else % this is needed to maintain compatibility if overrideFolder is non-empty
+cnst.folderName.BlocksNorm = strrep(cnst.folderName.Blocks,fullfile(cnst.overrideFolder,'BLOCKS'),fullfile(cnst.overrideFolder,'BLOCKS_NORM'));
+cnst.folderName.BlocksFail = strrep(cnst.folderName.Blocks,fullfile(cnst.overrideFolder,'BLOCKS'),fullfile(cnst.overrideFolder,'BLOCKS_NORM_FAIL'));  
+end
 
+disp(['--- will save normalized blocks (tiles) to ',cnst.folderName.BlocksNorm]);
 mkdir(cnst.folderName.BlocksNorm);
 mkdir(cnst.folderName.BlocksFail);
 

@@ -145,8 +145,8 @@ function resultCollection = plotROCcurves(resultCollection,cnst,currE)
                  set(gca,'YTick',cnst.axTicks);
                 end
                  title('');%dictionaryReplace(strrep(allvars{ja},'_','-'),{'nonMSIH','MSS/MMRp';'MSIH','MSI/MMRd'}));
-                 xlabel('Precision');
-                 ylabel('Recall');
+                 xlabel('Recall');       % FIXED on 13 Jun 2020
+                 ylabel('Precision');    % FIXED on 13 Jun 2020qw
                 %   pp.Color = [0 0 0]; %pp(2).Color = [.4 .4 .4];pp(3).Color = [.4 .4 .4];
                 set(gca,'FontSize',cnst.plotFontSize);
                 

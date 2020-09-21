@@ -29,13 +29,31 @@ disp(['- loading hyperparameter set: ',paramset]);
 switch lower(paramset)
     case 'default'
         disp('-- no hyperparam modification needed');
+    case 'long'
+        disp('-- enabled long learning');
+        hyperprm.MaxEpochs = 30;
     case 'hyper' % use max. VRAM
         hyperprm.MiniBatchSize = 1024;
+    case 'semiflexi'
+        disp('-- enabled semi flexible learning');
+        hyperprm.hotLayers = 30;
+        hyperprm.MaxEpochs = 12;  
+        hyperprm.MiniBatchSize = 256;
+    case 'subflexi'
+        disp('-- enabled semi flexible learning');
+        hyperprm.hotLayers = 30;
+        hyperprm.MaxEpochs = 8;  
+        hyperprm.MiniBatchSize = 512;
     case 'flexi'
         disp('-- enabled flexible learning (40 hot layers) & long training (careful, overfitting!)');
         hyperprm.hotLayers = 40;
         hyperprm.MaxEpochs = 25;  
         hyperprm.MiniBatchSize = 256;
+    case 'ganmode'
+        disp('-- enabled GAN mode learning');
+        hyperprm.hotLayers = 40;
+        hyperprm.MaxEpochs = 10;  
+        hyperprm.MiniBatchSize = 128;
     case 'lowresource'
         disp('--- low resource hyperparams');
         hyperprm.MiniBatchSize = 256;

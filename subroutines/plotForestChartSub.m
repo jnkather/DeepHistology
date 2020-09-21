@@ -4,6 +4,9 @@
 % 
 % documentation for this function:
 % this is used to visualize predictions as forest plots
+% 
+% this function will be deprecated in future releases,
+% please use forest() which is more generic
 
 function plotForestChartSub(currT,cnst,currTitle)
 

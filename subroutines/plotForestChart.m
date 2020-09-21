@@ -4,6 +4,9 @@
 % 
 % documentation for this function:
 % this is used for visualization of prediction performance
+% 
+% this function will be deprecated in future releases,
+% please use forest() which is more generic
 
 function plotForestChart(currIDs,targets,myT,cnst,myTitle)
 

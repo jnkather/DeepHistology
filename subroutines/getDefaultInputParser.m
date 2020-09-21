@@ -55,12 +55,15 @@ function p = getDefaultInputParser(myVargs)
     addParameter(p,'doPlot',false,@islogical); % show the ROC on screen
     addParameter(p,'doPrint',false,@islogical); % save the ROC to PDF and Imgs to PNG
     addParameter(p,'plotThreshold',false,@islogical); % plot the operating threshold on top
-    addParameter(p,'exportBlockPred',false,@islogical); % save CSV file for maps
+    addParameter(p,'exportBlockPred',false,@islogical); % save tile-level table for maps
+    addParameter(p,'exportBlockFormat','csv',@ischar); % must be csv or xlsx
     addParameter(p,'exportTopTiles',0,@isnumeric); % save showcase tiles 
     addParameter(p,'topPatients',3,@isnumeric); % showcase tiles from these patients
     addParameter(p,'plotFontSize',12,@isnumeric); % font size for plots    
     addParameter(p,'plotAUCthreshold',0.75,@isnumeric); % detailed visualization only for high performance targets
     addParameter(p,'onlyExplicitTargets',true,@islogical); % visualize only targets specified in experiment file
+    addParameter(p,'plotForest',false,@islogical); % plot a forest chart
+    addParameter(p,'forestLevels','',@ischar); % restrict forest plot names to these levels
     addParameter(p,'debugMode',false,@islogical); % debug mode
     
     %% fixed visualization parameters, do not change
