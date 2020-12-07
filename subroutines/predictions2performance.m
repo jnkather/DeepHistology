@@ -13,7 +13,7 @@ function [patientStats, varargout] = predictions2performance(blockPred,AnnData,c
     disp('-- starting to calculate statistics (AUROC, AUCPR)');
     
     % for each block (tile), find the corresponding slide file name
-    allFileNames = block2filename(blockPred.BlockNames);
+    allFileNames = block2filename(blockPred.BlockNames);    
     
     % iterate all true slide names and find corresponding tiles
     allAnnDataFiles = AnnData.FILENAME;

@@ -32,7 +32,7 @@ function tMERGE = getAnnotationData(cnst)
    sanityCheck(any(strcmp(tSLIDE.Properties.VariableNames,'FILENAME')),'FILENAME column in SLIDE');
    sanityCheck(numel(unique(tCLINI.PATIENT))==numel(tCLINI.PATIENT),'no duplicate patients CLINI');
    sanityCheck(numel(unique(tSLIDE.FILENAME))==numel(tSLIDE.FILENAME),'no duplicate filenames SLIDE');
-   sanityCheck(any(strcmp(tCLINI.Properties.VariableNames,cnst.annotation.targetCol)),'target variable CLINI');
+   sanityCheck(any(strcmp(tCLINI.Properties.VariableNames,cnst.annotation.targetCol)),['target variable CLINI: ',cnst.annotation.targetCol]);
    
    % are there patients with no slides?
    missCount = 0;
@@ -123,7 +123,8 @@ function tMERGE = getAnnotationData(cnst)
              ' patients with no match in CLINI table']);    
    
    disp('----- the table has the following target levels: ');
-   disp(cellstr(unique(tMERGE.TARGET))); 
+   dispUniqueValues(tMERGE.TARGET,10);
+   
    % clean up target variable
    disp('----- removing instances with undefined target');
    removeMe = find(isundefined(tMERGE.TARGET)); % remove missing targets
@@ -133,7 +134,7 @@ function tMERGE = getAnnotationData(cnst)
    disp(['-- merged table has ',num2str(numel(unique(tMERGE.PATIENT))),' patients']);
    disp(['-- merged table has ',num2str(numel(unique(tMERGE.FILENAME))),' slides']);
    disp('----- the table has the following target levels: ');
-   disp(cellstr(unique(tMERGE.TARGET)));
+   dispUniqueValues(tMERGE.TARGET,10);
    disp(['--- will remove ',num2str(numel(removeMe)),' slides']);
    tMERGE.PATIENT(removeMe) = [];
    tMERGE.FILENAME(removeMe) = [];
@@ -141,7 +142,7 @@ function tMERGE = getAnnotationData(cnst)
    disp(['-- merged table has ',num2str(numel(unique(tMERGE.PATIENT))),' patients']);
    disp(['-- merged table has ',num2str(numel(unique(tMERGE.FILENAME))),' slides']);
    disp('----- the final table has the following target levels: ');
-   disp(cellstr(unique(tMERGE.TARGET)));
+   dispUniqueValues(tMERGE.TARGET,10);
    if numel(cellstr(unique(tMERGE.TARGET)))<2
        tMERGE = [];
        warning('there are not enough target levels.');

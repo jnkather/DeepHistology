@@ -13,6 +13,8 @@ maxList = numel(myList);
 % THIS IS for blocks that have been produced with the matlatb script and
 % have the syntax <IMAGE>-blk-<RANDOM>
 
+disp(['--will use ',myList{1},' to determine name format']);
+
 if contains(myList{1},'-blk-')
     disp('-- auto detected block syntax <IMAGE>-blk-<RANDOM>');
 
@@ -49,24 +51,30 @@ elseif contains(myList{1},'_(')
         end
     end
     
-%     if contains(myList{1},'Rainbow')
-%         warning(' --- starting RAINBOW BREAST CANCER workaround');
-%        
-%         for i=1:maxList
-%         [~,myList{i},~] = fileparts(myList{i}); % remove path and suffix
-%         myList{i} = ['rainbow-', myList{i}(11:(end-1))]; 
-%            if mod(i,round(maxList/5))==0
-%             disp(['this block belongs to image ',...
-%                 char(myList{i}),' parsed ',num2str(round(i/maxList*100)),'%']);
-%            end
-%         end
-%     end
+elseif contains(myList{1},'_tile')
+    
+% THIS IS for blocks that have been produced at UChicago
+% have the syntax <IMAGE>_<REST>    
+
+    disp('-- auto detected block syntax <IMAGE>_tile<REST>');
+    
+    for i=1:maxList
+        [~,myList{i},~] = fileparts(myList{i}); % remove path and suffix
+        blk = strfind(myList{i},'_tile');
+        myList{i} = myList{i}(1:(blk(1)-1)); 
+       if mod(i,round(maxList/5))==0
+        disp(['this block belongs to image ',...
+            char(myList{i}),' parsed ',num2str(round(i/maxList*100)),'%']);
+        end
+    end
+    
 elseif contains(myList{1},'_')
     
 % THIS IS for blocks that have been produced at UChicago
 % have the syntax <IMAGE>_<REST>    
 
     disp('-- auto detected block syntax <IMAGE>_<REST>');
+    warning('--- this can lead to mismatches, make sure format is correct!');
     
     for i=1:maxList
         [~,myList{i},~] = fileparts(myList{i}); % remove path and suffix
