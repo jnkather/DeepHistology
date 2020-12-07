@@ -110,6 +110,9 @@ disp(['displaying result for ',char(currE)]);
         summary.hyper{count} = copyIsField(resultCollection.cnst,'hyper','N/A');
         summary.foldxval{count} = copyIsField(resultCollection.cnst,'foldxval',0);
         
+        summary.subsetTargetBy{count} = copyIsField(resultCollection.cnst,'subsetTargetsBy','');
+        summary.subsetTargetLevel{count} = copyIsField(resultCollection.cnst,'subsetTargetsLevel','');
+        
         summary.learningRate(count) = resultCollection.hyperprm.InitialLearnRate;
         summary.modelTemplate{count} = resultCollection.cnst.modelTemplate;       
         summary.totalTime(count) = resultCollection.totalTime;
@@ -142,6 +145,8 @@ disp(['displaying result for ',char(currE)]);
             if isfield(cnst,'exportTopTiles') && (cnst.exportTopTiles > 0) && ...
                     anyAUC(resultCollection,cnst.plotAUCthreshold)
                 [dcollect,sparsePatients] = getTopTiles(resultCollection,cnst,currTarget);
+                %warning('will load cnst from saved struct (experimental!)');
+                %[dcollect,sparsePatients] = getTopTiles(resultCollection,resultCollection.cnst,currTarget);
                 drawnow
                 if cnst.doPrint
                     writeTopTiles(dcollect,cnst,currE);
