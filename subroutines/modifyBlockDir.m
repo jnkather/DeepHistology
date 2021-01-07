@@ -28,7 +28,10 @@ disp('-- will modify block directory (load non-standard set of blocks=tiles)');
                 outdir = fullfile(basedir,'/BLOCKS-BIOPSY/');                
             case 'NORMALIZED'
                 disp(['--- will only load NORMALIZED blocks',newline]);
-                outdir = fullfile(basedir,'/BLOCKS_NORM/');       
+                outdir = fullfile(basedir,'/BLOCKS_NORM/');      
+            case 'MACENKO'
+                disp(['--- will only load MACENKO NORMALIZED blocks',newline]);
+                outdir = fullfile(basedir,'/BLOCKS_NORM_MACENKO/');				
             otherwise
                 disp(['trying to set non-standard alternative block dir: ',newline]);
                 outdir = fullfile(basedir,cnst.filterBlocks);

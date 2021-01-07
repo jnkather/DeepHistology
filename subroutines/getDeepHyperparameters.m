@@ -9,7 +9,6 @@
 function hyperprm = getDeepHyperparameters(paramset)
 
 % hard-code our default deep learning hyperparameters 
-hyperprm.InitialLearnRate = 1e-5;   % initial learning rate
 hyperprm.ValidationFrequency = 50;  % check validation performance every N iterations, 500 is 3x per epoch
 hyperprm.ValidationPatience = 5;    % wait N times before abort
 hyperprm.L2Regularization = 1e-4;   % optimization L2 constraint
@@ -23,22 +22,13 @@ hyperprm.hotLayers = 30;            % number of hot layers in the network (count
 hyperprm.GradientDecayFactor = 0.9; % adam's default (explicit is better than implicit)
 hyperprm.Epsilon = 1e-8;            % offset to avoid zero division (adam's default)
 hyperprm.DispatchInBackground = false; % asynchronous prefetch queuing of datastore (insane RAM explosion)
+hyperprm.MBSclassify = 128;         % mini batch size for classification in xval mode
 
 % hyperparameter sets allow to mandate changes with command line options
 disp(['- loading hyperparameter set: ',paramset]);
 switch lower(paramset)
     case 'default'
         disp('-- no hyperparam modification needed');
-    case 'long'
-        disp('-- enabled long learning');
-        hyperprm.MaxEpochs = 30;
-    case 'hyper' % use max. VRAM
-        hyperprm.MiniBatchSize = 1024;
-    case 'semiflexi'
-        disp('-- enabled semi flexible learning');
-        hyperprm.hotLayers = 30;
-        hyperprm.MaxEpochs = 12;  
-        hyperprm.MiniBatchSize = 256;
     case 'subflexi'
         disp('-- enabled semi flexible learning');
         hyperprm.hotLayers = 30;
@@ -63,8 +53,35 @@ switch lower(paramset)
     case 'verylowresource'
         disp('--- low resource hyperparams');
         hyperprm.MiniBatchSize = 128;
+    case 'mega'
+        disp('--- mega block hyperparams');
+        hyperprm.hotLayers = 10;
+        hyperprm.MiniBatchSize = 32;
+        hyperprm.MaxEpochs = 6;  
+        hyperprm.MBSclassify =   32;
+        hyperprm.InitialLearnRate =  1e-4;
+   case 'megalong8'
+        disp('--- mega block hyperparams v8');
+        hyperprm.hotLayers = 5;
+        hyperprm.MiniBatchSize = 32;
+        hyperprm.MaxEpochs = 1;  
+        hyperprm.MBSclassify =   32;
+        %hyperprm.ValidationFrequency = 50;  % check validation performance every N iterations, 500 is 3x per epoch
+        %hyperprm.ValidationPatience = 5;    % wait N times before abort
+        hyperprm.InitialLearnRate =  1e-5; 
+   case 'megalong9'
+        disp('--- mega block hyperparams v9');
+        hyperprm.hotLayers = 10;
+        hyperprm.MiniBatchSize = 32;
+        hyperprm.MaxEpochs = 4;  
+        hyperprm.MBSclassify =   32;
+        %hyperprm.ValidationFrequency = 50;  % check validation performance every N iterations, 500 is 3x per epoch
+        %hyperprm.ValidationPatience = 5;    % wait N times before abort
+        hyperprm.InitialLearnRate =  1e-5;
+        
+        
     otherwise
-        error('not yet implemented');
+        error('-- invalid hyperparameter set selected');
 end
 
 end

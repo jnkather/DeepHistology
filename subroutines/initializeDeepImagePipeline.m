@@ -8,6 +8,8 @@
 
 function [cnst,fCollect] = initializeDeepImagePipeline(cnst)
 
+cnst.version = getDeepHistologyVersion();
+
 rng('default'); % reset random number generator for reproducibility
 sq = @(varargin) varargin;      % helper function
 
@@ -35,31 +37,38 @@ if isa(cnst.ProjectName,'cell') && numel(cnst.ProjectName)>1 % multi cohorts
             disp('-- load blocks from standard block dir');
             cnst.folderName.Blocks{i} = fullfile(cnst.folderName.Temp,cnst.allProjects{i},'/BLOCKS/'); % abs. path to block save folder
         end
+    end   
+    if isfield(cnst,'overrideBaseDir')
+        cnst.folderName.Blocks = overrideBaseDir(cnst.folderName.Blocks,cnst.folderName.Temp,cnst.overrideBaseDir);
     end
 else % standard single cohort
     cnst.multipleCohorts = false;
     disp('-- preparing single cohort');
+    
+    % check for overridden tile folder (defined in experiment file)
+    if isfield(cnst,'overrideFolder') && ~isempty(cnst.overrideFolder)
+        disp(['-- manual OVERRIDE of tile (blocks) folder from [',cnst.ProjectName,...
+             '] to [',cnst.overrideFolder,'] /[BLOCKDIR]/']);
+        cnst.projectFolderName = cnst.overrideFolder;  % abs. path to block save folder
+    else
+        cnst.projectFolderName = cnst.ProjectName;
+        disp('-- no manual override of tile folder');
+    end
     
     % check for subset tile folder (e.g. stroma only; defined on command line)
     if isfield(cnst,'filterBlocks') && ~isempty(cnst.filterBlocks) && ~strcmp(cnst.filterBlocks,'') % non-standard block dir
         disp('-- will modify experiment name to account for non-standard block dir');
         cnst.experimentName = matlab.lang.makeValidName(...
             [cnst.experimentName,'-',cnst.filterBlocks]);
-        cnst.folderName.Blocks = modifyBlockDir(cnst,fullfile(cnst.folderName.Temp,cnst.ProjectName));  % abs. path to block save folder
+        cnst.folderName.Blocks = modifyBlockDir(cnst,fullfile(cnst.folderName.Temp,cnst.projectFolderName));  % abs. path to block save folder
     else % standard block dir
-        cnst.folderName.Blocks = fullfile(cnst.folderName.Temp,cnst.ProjectName,'/BLOCKS/');  % abs. path to block save folder
+        cnst.folderName.Blocks = fullfile(cnst.folderName.Temp,cnst.projectFolderName,'/BLOCKS/');  % abs. path to block save folder
     end
     
-    % check for overridden tile folder (defined in experiment file)
-    if isfield(cnst,'overrideFolder') && ~isempty(cnst.overrideFolder)
-        disp(['-- manual OVERRIDE of tile (blocks) folder from [',cnst.ProjectName,...
-             '] to [',cnst.overrideFolder,'] /BLOCKS/']);
-        cnst.folderName.Blocks = fullfile(cnst.folderName.Temp,cnst.overrideFolder,'/BLOCKS/');  % abs. path to block save folder
-    else
-        disp('-- no manual override of tile folder');
-    end
         
 end
+
+disp(['--- I will load tiles from: ', cnst.folderName.Blocks]);
 
 % prepare path names and create folders if needed
 cnst.folderName.Dump = fullfile(cnst.folderName.Temp,cnst.ProjectName,'/DUMP/'); % abs. path to block save folder

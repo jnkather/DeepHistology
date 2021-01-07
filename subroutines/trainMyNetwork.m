@@ -42,7 +42,8 @@ function [postNet,stats] = trainMyNetwork(preNet,imdsTRN,imdsTST,cnst,hyperprm)
             'OutputSizeMode',cnst.blocks.resizeMethod); 
         externalTST_AUG.MiniBatchSize = hyperprm.MiniBatchSize;
         [stats.blockStats.PLabels,stats.blockStats.Scores] = classify(postNet, ...
-            externalTST_AUG, 'ExecutionEnvironment',hyperprm.ExecutionEnvironment);
+            externalTST_AUG, 'ExecutionEnvironment',hyperprm.ExecutionEnvironment,...
+            'MiniBatchSize',hyperprm.MBSclassify);
         stats.blockStats.Accuracy = mean(stats.blockStats.PLabels == imdsTST.Labels);
         stats.blockStats.BlockNames = imdsTST.Files;
     else % no test set defined, so cannot return any stats

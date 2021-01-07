@@ -66,6 +66,21 @@ switch lower(cnst.modelTemplate)
         rawnet = shufflenet;
         layersForRemoval = {'node_202', 'node_203','ClassificationLayer_node_203'};
         layersForReconnection = {'node_200','fc'};
+     case 'shufflenet5120' % modified shufflenet with 512x512x3 input layer
+        load('./networks/shufflenet5120.mat','shufflenet5120');
+        rawnet = shufflenet5120;
+        layersForRemoval = {'node_202', 'node_203','ClassificationLayer_node_203'};
+        layersForReconnection = {'node_200','fc'};
+    case 'shufflenet2560' % modified shufflenet with 512x512x3 input layer
+        load('./networks/shufflenet2560.mat','shufflenet2560');
+        rawnet = shufflenet2560;
+        layersForRemoval = {'node_202', 'node_203','ClassificationLayer_node_203'};
+        layersForReconnection = {'node_200','fc'};
+     case 'shufflenet1024' % modified shufflenet with 512x512x3 input layer
+        load('./networks/shufflenet1024.mat','shufflenet1024');
+        rawnet = shufflenet1024;
+        layersForRemoval = {'node_202', 'node_203','ClassificationLayer_node_203'};
+        layersForReconnection = {'node_200','fc'};
     case 'shufflenet512' % modified shufflenet with 512x512x3 input layer
         load('./networks/shufflenet512.mat','shufflenet512');
         rawnet = shufflenet512;

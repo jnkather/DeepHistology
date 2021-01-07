@@ -26,7 +26,7 @@ function p = getDefaultInputParser(myVargs)
     addParameter(p,'foldxval',3,@isnumeric); % if cross validation is used, this is the fold, default 3
     addParameter(p,'xvalmode','xval',@ischar); % can be 'xval' or 'holdout' (= only first run)
     addParameter(p,'aggregateMode','majority',@ischar); % how to pool block predictions per patient, 'majority', 'mean' or 'max'
-    addParameter(p,'saveTileTable',false,@islogical); % save a table for all tile predictions for viz
+    % addParameter(p,'saveTileTable',false,@islogical); % DEPRECATED save a table for all tile predictions for viz
     addParameter(p,'tableModeClini','XLSX',@ischar); % file format of clinical table, XLSX or CSV
     addParameter(p,'hyper','default',@ischar); % set of hyperparameters
     addParameter(p,'valSet',[],@isnumeric); % validation set proportion of training set, default no validation (recommend 0.05)
@@ -59,6 +59,7 @@ function p = getDefaultInputParser(myVargs)
     addParameter(p,'exportBlockFormat','csv',@ischar); % must be csv or xlsx
     addParameter(p,'exportTopTiles',0,@isnumeric); % save showcase tiles 
     addParameter(p,'topPatients',3,@isnumeric); % showcase tiles from these patients
+    addParameter(p,'visualizeBaselineTiles',false,@islogical); % for visualization of top tiles, fall back to BLOCKS 
     addParameter(p,'plotFontSize',12,@isnumeric); % font size for plots    
     addParameter(p,'plotAUCthreshold',0.75,@isnumeric); % detailed visualization only for high performance targets
     addParameter(p,'onlyExplicitTargets',true,@islogical); % visualize only targets specified in experiment file

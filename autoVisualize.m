@@ -113,6 +113,8 @@ disp(['displaying result for ',char(currE)]);
         summary.subsetTargetBy{count} = copyIsField(resultCollection.cnst,'subsetTargetsBy','');
         summary.subsetTargetLevel{count} = copyIsField(resultCollection.cnst,'subsetTargetsLevel','');
         
+        summary.trainedModelID{count} = copyIsField(resultCollection.cnst,'trainedModelID','');
+        
         summary.learningRate(count) = resultCollection.hyperprm.InitialLearnRate;
         summary.modelTemplate{count} = resultCollection.cnst.modelTemplate;       
         summary.totalTime(count) = resultCollection.totalTime;

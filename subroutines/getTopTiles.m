@@ -65,6 +65,14 @@ function [dcollect,sparsePatients] = getTopTiles(resultCollection,cnst,currTarge
                 dcollect.(char(currCategory)).TileScores = [dcollect.(char(currCategory)).TileScores;uus];
                 dcollect.(char(currCategory)).PatientScores = [dcollect.(char(currCategory)).PatientScores; repmat(uup(ipat),cnst.exportTopTiles,1)];
             end
+
+            if cnst.visualizeBaselineTiles
+                disp('--- for visualization of top tiles, I will replace BLOCKS_NORM and BLOCKS_MACENKO by BLOCKS')
+                dcollect.(char(currCategory)).TileNames = strrep(dcollect.(char(currCategory)).TileNames,'BLOCKS_NORM','BLOCKS')
+                dcollect.(char(currCategory)).TileNames = strrep(dcollect.(char(currCategory)).TileNames,'BLOCKS_MACENKO','BLOCKS')    
+            end
+
+
         end
 
     end % end of category iteration
