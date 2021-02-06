@@ -29,11 +29,19 @@ disp(['- loading hyperparameter set: ',paramset]);
 switch lower(paramset)
     case 'default'
         disp('-- no hyperparam modification needed');
+    case 'megaproject'
+        hyperprm.MaxEpochs = 8;
+        hyperprm.ValidationPatience = 5;
+        hyperprm.ValidationFrequency = 200;
+        disp('-- colorectal megaproject');
     case 'subflexi'
         disp('-- enabled semi flexible learning');
         hyperprm.hotLayers = 30;
         hyperprm.MaxEpochs = 8;  
         hyperprm.MiniBatchSize = 512;
+    case 'vram48'
+        disp('-- hyperparameters for VRAM 48 GB');
+        hyperprm.MiniBatchSize = 1024;    
     case 'flexi'
         disp('-- enabled flexible learning (40 hot layers) & long training (careful, overfitting!)');
         hyperprm.hotLayers = 40;
@@ -60,26 +68,7 @@ switch lower(paramset)
         hyperprm.MaxEpochs = 6;  
         hyperprm.MBSclassify =   32;
         hyperprm.InitialLearnRate =  1e-4;
-   case 'megalong8'
-        disp('--- mega block hyperparams v8');
-        hyperprm.hotLayers = 5;
-        hyperprm.MiniBatchSize = 32;
-        hyperprm.MaxEpochs = 1;  
-        hyperprm.MBSclassify =   32;
-        %hyperprm.ValidationFrequency = 50;  % check validation performance every N iterations, 500 is 3x per epoch
-        %hyperprm.ValidationPatience = 5;    % wait N times before abort
-        hyperprm.InitialLearnRate =  1e-5; 
-   case 'megalong9'
-        disp('--- mega block hyperparams v9');
-        hyperprm.hotLayers = 10;
-        hyperprm.MiniBatchSize = 32;
-        hyperprm.MaxEpochs = 4;  
-        hyperprm.MBSclassify =   32;
-        %hyperprm.ValidationFrequency = 50;  % check validation performance every N iterations, 500 is 3x per epoch
-        %hyperprm.ValidationPatience = 5;    % wait N times before abort
-        hyperprm.InitialLearnRate =  1e-5;
-        
-        
+       
     otherwise
         error('-- invalid hyperparameter set selected');
 end

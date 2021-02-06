@@ -129,7 +129,11 @@ disp(['displaying result for ',char(currE)]);
             blockNames = resultCollection.blockStats.BlockNames;
             allScores = resultCollection.blockStats.Scores;
             blockOutTable = [table(blockNames),array2table(allScores)];
-            blockOutTable.Properties.VariableNames = [{'blockName'},fieldnames(resultCollection.patientStats.rawData.predictions)'];
+            % get categories for column headers in the right order, added 2021
+            uPatCat = unique(resultCollection.patientStats.rawData.trueCategory); 
+            uCategories = getUcategoriesInOrder(uPatCat,resultCollection.blockStats);
+            %[{'blockName'},fieldnames(resultCollection.patientStats.rawData.predictions)']; WRONG 
+            blockOutTable.Properties.VariableNames = [{'blockName'},uCategories'];
             switch lower(cnst.exportBlockFormat)
                 case 'csv'
                 writetable(blockOutTable,...
@@ -146,6 +150,12 @@ disp(['displaying result for ',char(currE)]);
             % optional: export the highest scoring tiles
             if isfield(cnst,'exportTopTiles') && (cnst.exportTopTiles > 0) && ...
                     anyAUC(resultCollection,cnst.plotAUCthreshold)
+               if cnst.overrideTileDrive
+                 disp('--- Will fix the drive for tile directory');
+                 resultCollection.blockStats.BlockNames = ...
+                     strrep(resultCollection.blockStats.BlockNames,cnst.overrideDriveFrom,cnst.overrideDriveTo);
+                 disp('---- done');
+                end
                 [dcollect,sparsePatients] = getTopTiles(resultCollection,cnst,currTarget);
                 %warning('will load cnst from saved struct (experimental!)');
                 %[dcollect,sparsePatients] = getTopTiles(resultCollection,resultCollection.cnst,currTarget);

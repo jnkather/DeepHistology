@@ -156,7 +156,11 @@ function resultCollection = plotROCcurves(resultCollection,cnst,currE)
              drawnow
              
              if cnst.doPrint
+                try
                 print(['./output_figure/',strrep(char(currE),'_','-'),'.pdf'],'-dpdf','-bestfit');
+                catch
+                    warning('saving ROC plots as PDF failed, will continue...');
+                end
              end
 
 end

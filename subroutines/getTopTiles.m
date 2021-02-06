@@ -8,8 +8,9 @@
 
 function [dcollect,sparsePatients] = getTopTiles(resultCollection,cnst,currTarget)
 
-    disp('loading all blocks in image datastore');
-    uCategories = unique(resultCollection.patientStats.rawData.trueCategory);
+    disp('loading all blocks in image datastore for top tile creation');
+    uPatCat = unique(resultCollection.patientStats.rawData.trueCategory); 
+    uCategories = getUcategoriesInOrder(uPatCat,resultCollection.blockStats);
     % prepare data for tile-patient assignment
     cnst.annotation.targetCol = currTarget;
     AnnData = getAnnotationData(cnst);
@@ -43,12 +44,18 @@ function [dcollect,sparsePatients] = getTopTiles(resultCollection,cnst,currTarge
         currPatients = resultCollection.patientStats.rawData.patientNames(currPatientsMask);
         currPatPredictions = resultCollection.patientStats.rawData.predictions.(char(cellstr(currCategory)))(currPatientsMask);
         [uup,uip] = sort(currPatPredictions,'descend');
-        targetPatients = currPatients(uip(1:min(cnst.topPatients,numel(currPatients))));
-
+        disp(['--- will use these patients for class ',char(cellstr(currCategory))]);
+        targetPatients = currPatients(uip(1:min(cnst.topPatients,numel(currPatients)))) %#ok 
+        
         % iterate top patients and find their N top tiles
         for ipat = 1:numel(targetPatients)
             thisPatientID = targetPatients(ipat);
             thisPatientTiles = find(strcmp(newBlockStats.parentPatient, thisPatientID));
+            
+%             % do a sanity check on the order of categories
+%             [~,mm] = max(mean(newBlockStats.Scores(thisPatientTiles,:),1));  % which column has the highest mean
+%             find(uCategories==currCategory); % the current true category 
+
             [uus,uis] = sort(newBlockStats.Scores(thisPatientTiles,uCategories==currCategory),'descend');
 
             % collect tiles and prepare montage for export

@@ -66,7 +66,10 @@ function p = getDefaultInputParser(myVargs)
     addParameter(p,'plotForest',false,@islogical); % plot a forest chart
     addParameter(p,'forestLevels','',@ischar); % restrict forest plot names to these levels
     addParameter(p,'debugMode',false,@islogical); % debug mode
-    
+    addParameter(p,'overrideTileDrive',false,@islogical); % override the drive letter for tiles for vis
+    addParameter(p,'overrideDriveFrom',' ',@ischar); % override the drive letter from this
+    addParameter(p,'overrideDriveTo',' ',@ischar); % override the drive letter to this
+
     %% fixed visualization parameters, do not change
     addParameter(p,'axTicks',0:0.2:1);     % primary axis tick labels for ROC curves
     addParameter(p,'axTicksFine',0:0.1:1); % secondary axis tick labels for ROC curves
