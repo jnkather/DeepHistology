@@ -43,7 +43,7 @@ function [patientStats, varargout] = predictions2performance(blockPred,AnnData,c
         for uc = 1:numel(uCats)
             if isfield(cnst,'aggregateMode') && strcmp(cnst.aggregateMode,'mean')
                 patientPredictions.predictions.(char(uCats(uc)))(i) = ...
-                    mean(double(currScores(:,uc)));
+                    mean(double(currScores(:,uc)));  
             elseif isfield(cnst,'aggregateMode') && strcmp(cnst.aggregateMode,'max')
                 patientPredictions.predictions.(char(uCats(uc)))(i) = ...
                     max(double(currScores(:,uc)));     
