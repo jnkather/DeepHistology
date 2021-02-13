@@ -134,7 +134,7 @@ disp(['displaying result for ',char(currE)]);
             uCategories = getUcategoriesInOrder(uPatCat,resultCollection.blockStats);
             %[{'blockName'},fieldnames(resultCollection.patientStats.rawData.predictions)']; WRONG 
             % blockOutTable.Properties.VariableNames = [{'blockName'},uCategories'];
-            rmdim = @(in) in(:); % remove dimensions
+            rmdim = @(in) in(:)'; % remove dimensions
             blockOutTable.Properties.VariableNames = [{'blockName'},rmdim(cellstr(uCategories))];
             switch lower(cnst.exportBlockFormat)
                 case 'csv'
