@@ -5,7 +5,7 @@
 % documentation for this function:
 % this funcion defines the input arguments for the main scripts
 
-function p = getDefaultInputParser(myVargs)
+function p = getInputParser(myVargs)
 
     p = inputParser;            % prepare to parse user input
     p.CaseSensitive = false;    % input is not case sensitive
@@ -25,8 +25,7 @@ function p = getDefaultInputParser(myVargs)
     addParameter(p,'binarizeQuantile',[]); % split HI LO at this quantile (between 0 and 0.5)
     addParameter(p,'foldxval',3,@isnumeric); % if cross validation is used, this is the fold, default 3
     addParameter(p,'xvalmode','xval',@ischar); % can be 'xval' or 'holdout' (= only first run)
-    addParameter(p,'aggregateMode','majority',@ischar); % how to pool block predictions per patient, 'majority', 'mean' or 'max'
-    % addParameter(p,'saveTileTable',false,@islogical); % DEPRECATED save a table for all tile predictions for viz
+    addParameter(p,'aggregateMode','majority',@ischar); % how to pool block predictions per patient, 'majority', 'ignoreClass', 'mean' or 'max'
     addParameter(p,'tableModeClini','XLSX',@ischar); % file format of clinical table, XLSX or CSV
     addParameter(p,'hyper','default',@ischar); % set of hyperparameters
     addParameter(p,'valSet',[],@isnumeric); % validation set proportion of training set, default no validation (recommend 0.05)
@@ -35,10 +34,12 @@ function p = getDefaultInputParser(myVargs)
     addParameter(p,'subsetTargetsLevel',[]); % subset the patients by this level in the variable
     addParameter(p,'skipExistingTargets',false,@islogical); % skip target prediction if result file exists
     addParameter(p,'forgiveError',false,@islogical); % ignore errors during training and go on to the next task
+    addParameter(p,'maxBlocksPerClass',1e9,@isnumeric); % hard limit to the number of tiles per class in xval mode
+    addParameter(p,'nBootstrapAUC',10,@isnumeric);   % bootstrap for AUC confidence interval, default 10
+    addParameter(p,'whichIgnoreClass','',@ischar); % ignore this class for statistics, only works if aggregateMode is ignoreClass
     
     % holy input parameters, do not change
     addParameter(p,'saveUnmatchedBlocks',false,@islogical);   % save list of unmatchable blocks, may blow up output file size
-    addParameter(p,'nBootstrapAUC',10,@isnumeric);   % bootstrap for AUC confidence interval, default 10
     addParameter(p,'undersampleTrainingSet',true,@islogical); % equalize training set just before training
     addParameter(p,'binarizeThresh',5,@isnumeric);    % convert num targets with more than N levels to HI / LO
     addParameter(p,'fileformatBlocks','.jpg',@ischar);  % define format for Blocks

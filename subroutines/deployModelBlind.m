@@ -14,7 +14,8 @@ function outputSummary = deployModelBlind(hyperprm,finalModel,allBlocksLabeled)
   %aa = activations(finalModel,test_AUG,'classoutput','ExecutionEnvironment','gpu');
   
   [stats.blockStats.PLabels,stats.blockStats.Scores] = classify(finalModel, ...
-            test_AUG, 'ExecutionEnvironment',hyperprm.ExecutionEnvironment);
+            test_AUG, 'ExecutionEnvironment',hyperprm.ExecutionEnvironment,...
+            'MiniBatchSize',hyperprm.MiniBatchSize);
   disp('finished prediction.');
   
   outputSummary.allAUC = [];

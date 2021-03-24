@@ -6,11 +6,21 @@
 % this script will equalize the clases in an image datastore object so that
 % there is the same number of training instances for each label
 
-function imds = equalizeClasses(imds)
+function imds = equalizeClasses(imds,maxBlockNum)
     
-    disp('-- starting to equalize the classes in this image set');
+    disp('-- starting to equalize the classes on TILE level just before training');
     numLabels = countEachLabel(imds); % count each label
-    targetNum = min(numLabels.Count); % minimum label count
+    % the minimum number of tiles per label is EITHER the number of the
+    % lowest prevalent label OR a fixed number maxTargetNum, whichever is
+    % smaller
+    
+    disp([' -- number of Tiles in the least abundant class is ',num2str(min(numLabels.Count))]);
+    disp([' -- the hard upper limit for tiles per class is ',num2str(maxBlockNum)]);
+    
+    targetNum = min(maxBlockNum,min(numLabels.Count)); 
+    
+    disp([' -- therefore I will limit tiles per class to ',num2str(targetNum)]);
+    
     ulabels = numLabels.Label(:);
     
     for iu = 1:numel(ulabels)
@@ -20,7 +30,7 @@ function imds = equalizeClasses(imds)
             allInstances = find(classIndices);
             rng('default'); % for reproducibility
             allInstances = allInstances(randperm(numel(allInstances))); % shuffle elements
-            imds.Files(allInstances(targetNum:end)) = [];
+            imds.Files(allInstances((targetNum+1):end)) = []; % fixed the missing +1 bug
         end
     end
     

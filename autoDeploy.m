@@ -8,7 +8,7 @@
 
 function autoDeploy(varargin)
 addpath(genpath('./subroutines/'));      % add dependencies
-iPrs = getDefaultInputParser(varargin);  % get input parser, define default values
+iPrs = getInputParser(varargin);  % get input parser, define default values
 gpuDevice(iPrs.Results.gpuDev);          % select GPU device (Windows only)
 cnst = loadExperiment(iPrs.Results.experiment); % load experiment from JSON
 
@@ -16,7 +16,7 @@ disp('-- starting DEPLOYMENT job with these input (or default) settings:');
 dispAllFields(iPrs.Results);
 cnst = copyfields(cnst,iPrs.Results,fieldnames(iPrs.Results)); % apply input
 [cnst,fCollect] = initializeDeepImagePipeline(cnst);  % initialize
-hyperprm = getDeepHyperparameters(cnst.hyper);        % load DL hyperparams
+hyperprm = getHyperparameters(cnst.hyper);        % load DL hyperparams
 dispAllFields(cnst);        % display all constants on console
 dispAllFields(hyperprm);    % display all hyperparameters on console
 
@@ -58,7 +58,8 @@ for ti = 1:numel(cnst.allTargets)
     resultCollection{ti}.hyperprm = hyperprm;
     resultCollection{ti}.totalTime = totalTime;
 
-    save(fullfile(cnst.folderName.Dump,[cnst.experimentName,'_lastResult_v6.mat']),'resultCollection');
+    save(fullfile(cnst.folderName.Dump,[cnst.experimentName,...
+        '_lastResult_v6.mat']),'resultCollection','-v7.3');
 
 end
 end

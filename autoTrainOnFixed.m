@@ -7,7 +7,7 @@
 
 function autoTrainOnFixed(varargin)
 addpath(genpath('./subroutines/'));      % add dependencies
-iPrs = getDefaultInputParser(varargin);  % get input parser, define default values
+iPrs = getInputParser(varargin);  % get input parser, define default values
 gpuDevice(iPrs.Results.gpuDev);          % select GPU device (Windows only)
 cnst.ProjectName = 'autoTrainOn';
 cnst.baseName = 'autoTrainOn';
@@ -22,7 +22,7 @@ cnst.folderName.Temp = cnst.trainOnFolder;
 cnst.folderName.Dump = fullfile(cnst.folderName.Temp,cnst.ProjectName,'/DUMP/'); % abs. path to block save folder
     [~,~,~] = mkdir(char(cnst.folderName.Dump));
 
-hyperprm = getDeepHyperparameters(cnst.hyper);        % load DL hyperparams
+hyperprm = getHyperparameters(cnst.hyper);        % load DL hyperparams
 rng('shuffle');
 cnst.experimentName = [cnst.baseName,'-',randseq(5,'Alphabet','AA')];
 disp([newline,'#################',newline,...

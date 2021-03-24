@@ -1,5 +1,5 @@
 # DeepHistology
-This is a pan-cancer platform for mutation prediction from routine histology by the Kather lab (http://kather.ai). It is implemented in MATLAB and requires version R2019a+ (for some types of visualization, R2019b+). The following Matlab toolboxes are required: Image processing toolbox, Deep learning toolbox, Parallel processing toolbox.
+This is a pan-cancer platform for mutation prediction from routine histology by the Kather lab (http://kather.ai). It is implemented in MATLAB and requires version R2019a+ (for some types of visualization, R2019b+; the code is tested up to R2020b). The following Matlab toolboxes are required: Image processing toolbox, Deep learning toolbox, Parallel processing toolbox; also, shufflenet model from the Matlab Add-On manager. 
 
 ![Fig1](figure1.jpg)
 
@@ -7,7 +7,7 @@ Briefly, to use these scripts, you should
 1. prepare your data according to the Aachen protocol as described here: https://zenodo.org/record/3694994 
 2. prepare an "experiment file" which specifies the name of the project, the location of the tiles and the targets to be predicted
 3. run autoDeepLearn('experiment','<your experiment name>') to run a cross-validated experiment
-4. visualize the results with autoVisualize('experiment','<your experiment name>')
+4. visualize the results with autoVisualize('experiment','<your experiment name>') 
 
 An example for a possible data structure (project TCGA-CRC-DX) is:
 - experiment file 'tcga-crc-generated' is located in './experiments'
@@ -33,14 +33,13 @@ Argument | Default Value | Description
 --- | --- | ---
 experiment | '' |  which experiment to load
 gpuDev     | 1 | GPU Device (1 or greater)
-maxBlockNum | 1000 | number of  (tiles) per whole slide image
+maxBlockNum | 1000 | number of blocks (tiles) per whole slide image, upper limit for computational efficiency, applies in any mode (xval, deploy, train-test, ...)
 trainFull | false | train on full dataset after xval
 modelTemplate | shufflenet512 | which pretrained model, possible options are defined in getAndModifyNet()
 backwards | false | for each experiment, work backwards in the list of targets
 binarizeQuantile | [] | split high/low at this quantile, possible options: floating point number between 0 and 0.5 or empty (use mean)
 foldxval | 3 | if cross validation is used, this is the fold, possible option: any positive integer. If this is 0, no cross validation will be done. 
-aggregateMode | majority | how to pool block predictions per patient, possible otions: 'majority', 'mean' or 'max'
-saveTileTable | false | save a table for all tile predictions for visualization in QuPath
+aggregateMode | majority | how to pool block predictions per patient, possible otions: 'majority', 'ignoreClass' (variant of majority, see below), 'mean' or 'max'
 tableModeClini | XLSX | file format of clinical table, XLSX or CSV
 hyper | default | set of hyperparameters as defined in getDeepHyperparameters(), possible options: default, lowresource or verylowresource
 valSet | [] | validation set proportion of training set to stop training early
@@ -49,6 +48,9 @@ subsetTargetsBy | [] | subset the patients by a variable
 subsetTargetsLevel | [] | subset the patients by this level in the variable
 skipExistingTargets | false |  skip target prediction if result file exists
 forgiveError | false | ignore errors during training and go on to the next task
+maxBlocksPerClass | 1e9 | hard limit on the number of tiles per class, with default this will never be reached; if you set this to lower values this will enforce additional random undersampling (in xval mode only!)
+nBootstrapAUC | 10 | bootstrap number to calculate AUROC confidence intervals
+whichIgnoreClass | '' | ignore this class for score calculation (e.g. this is a neutral class such as "no_tumor".) This will NOT be used as a negative class for all the other classes. Only works if aggregateMode == ignoreClass
 
 ### autoDeploy
 

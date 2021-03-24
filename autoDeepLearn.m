@@ -8,14 +8,14 @@
 
 function autoDeepLearn(varargin)
 addpath(genpath('./subroutines/'));      % add dependencies
-iPrs = getDefaultInputParser(varargin);  % get input parser, define default values
+iPrs = getInputParser(varargin);  % get input parser, define default values
 gpuDevice(iPrs.Results.gpuDev);          % select GPU device (Windows only)
 cnst = loadExperiment(iPrs.Results.experiment); % load experiment from JSON
 disp('-- starting job with these input (or default) settings:');
 dispAllFields(iPrs.Results); 
 cnst = copyfields(cnst,iPrs.Results,fieldnames(iPrs.Results)); % apply input
 [cnst,fCollect] = initializeDeepImagePipeline(cnst);  % initialize
-hyperprm = getDeepHyperparameters(cnst.hyper);        % load DL hyperparams
+hyperprm = getHyperparameters(cnst.hyper);        % load DL hyperparams
 dispAllFields(cnst);        % display all constants on console
 dispAllFields(hyperprm);    % display all hyperparameters on console
 sq = @(varargin) varargin;  % define squeeze function
@@ -72,16 +72,17 @@ for ti = 1:numel(cnst.allTargets) % iterate target variables in this experiment
                 imdsTRN = copy(allBlocks);
                 imdsTRN.Files(ismember(imdsTRN.Files,imdsTST.Files)) = []; % remove all test set files from the training set
                 disp(['---- there are ',num2str(numel(imdsTRN.Files)),' tiles in the training set']);
+                % default behavior: class-balance on TILE level by undersampling
                 if cnst.undersampleTrainingSet
-                    imdsTRN = equalizeClasses(imdsTRN); % undersample training set
+                    imdsTRN = equalizeClasses(imdsTRN,cnst.maxBlocksPerClass); % undersample training set for balancing
                     disp(['---- after undersampling, there are ',num2str(numel(imdsTRN.Files)),' tiles in the training set']);
                 end
-                % optional: export tiles of first xval run
+                % optional: export tiles of first xval run for publication
                 if ir==1 && isfield(cnst,'exportTiles') && cnst.exportTiles 
                     exportTiles(cnst,imdsTRN,imdsTST);
                 end
                 % train the network
-                [~,partitionPredictions{ir}] = trainMyNetwork(myNet,imdsTRN,imdsTST,cnst,hyperprm);
+                [~,partitionPredictions{ir}] = trainMyNetwork(myNet,imdsTRN,imdsTST,cnst,hyperprm); %!ok
                 % if holdout mode is active, then stop xval after 1st run
                 if ir == 1 && isfield(cnst,'xvalmode') && strcmp(cnst.xvalmode,'holdout')
                     disp('-- train in holdout mode = use only first xval run');

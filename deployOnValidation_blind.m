@@ -1,6 +1,6 @@
-% JN Kather Aachen / Chicago 2019-2020
+% JN Kather Aachen / Chicago 2019
 % this script is part of the digital pathology deep learning project
-% caution, this script is highly experimental and not recommended for productive use
+% MELANIE = seMiautomatic dEep LeArniNg pIplinE
 %
 %         Step 1: open all SVS images and draw regions
 %         Step 2: cut the ROIs into blocks
@@ -13,19 +13,21 @@
 % 
 % this is the *BLIND* version of our script which will be used whenever we
 % want to predict a validation cohort but stay blinded to the ground truth
+% --- caution this function is not yet properly embedded in the whole pipeline and
+% may need some manual babysitting
 
 %% Header
 clear variables, format compact, close all; clc % clean up
 %setenv CUDA_VISIBLE_DEVICES 1 % use only first GPU
 gpuDevice(1)
 addpath(genpath('./subroutines/'));  % add dependencies
-cnst = loadExperiment('romanmsi-rtx'); % yorknorm-rtx
+cnst = loadExperiment('romanmsi-rtx'); 
 cnst.fileformatBlocks = {'.jpg'};
 
 % load deep learning hyperparameters and initialize deep learning model
-hyperprm = getDeepHyperparameters('default');
+hyperprm = getHyperparameters('default');
 hyperprm.ExecutionEnvironment = 'gpu';
-hyperprm.MiniBatchSize = 32; 
+hyperprm.MiniBatchSize = 2048; 
 cnst.debugMode = false;
 
 [cnst,fCollect] = initializeDeepImagePipeline(cnst); % initialize
@@ -34,8 +36,8 @@ cnst.verbose  = false;    % show intermediary steps?
 cnst.simulate = false;   % simulate only? default false (-> do it!)
 
 % load the trained model
-cnst.trainedModelFolder = fullfile('E:\RAINBOW-CRC-DX--DACHS-CRCFULL-DX--TCGA-CRC-DX--QUASAR-CRC-DX\DUMP\'); %'E:\RAINBOW-CRC-DX--DACHS-CRCFULL-DX--TCGA-CRC-DX--QUASAR-CRC-DX\DUMP\';%'E:\ALLBLOCKS\TCGA-BRCA-DX\DUMP\'; %fullfile('..\..\2019-Virus_from_HE\ALLVIRUS\DUMP');
-cnst.trainedModelID = 'HLVDDREQHWQK-WPDRE_isMSIH'; %'PQAYQMYAPRWG-QWWHP_isMSIH'; % trained model ID
+cnst.trainedModelFolder = fullfile('E:\RAINBOW-CRC-DX--DACHS-CRCFULL-DX--TCGA-CRC-DX--QUASAR-CRC-DX\DUMP\'); 
+cnst.trainedModelID = 'HLVDDREQHWQK-WPDRE_isMSIH'; 
 
 load(fullfile(cnst.trainedModelFolder,[cnst.trainedModelID,'_lastModel_v6.mat']));
 
@@ -45,13 +47,8 @@ load(fullfile(cnst.trainedModelFolder,[cnst.trainedModelID,'_lastModel_v6.mat'])
 cnst.annotation.Dir = './cliniData/';
 cnst.annotation.SlideTable = [cnst.ProjectName,'_SLIDE.csv'];
 cnst.annotation.CliniTable = [cnst.ProjectName,'_CLINI.xlsx'];
-
-% -------- START DEBUG --------
 cnst.blocks.maxBlockNum = 1000;
 cnst.aggregateMode = 'majority';
-cnst.saveTopTiles = 0; % save the N highest scoring tiles
-cnst.saveTileTable = 0; % save a table for all tile predictions for viz
-% -------- END DEBUG --------
 
 z1 = tic;
 allBlocksLabeled = copy(fCollect.Blocks);

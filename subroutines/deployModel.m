@@ -7,7 +7,6 @@
 % it to an imageDatastore 
 
 
-
 function stats = deployModel(cnst,hyperprm,finalModel,imdsTST)
 
   externaltest_AUG = ...

@@ -10,23 +10,17 @@
 
 function classOut = getTargetClass(dataIn)
 
-
+    disp('--- replacing class names for better legibility');
+    
     % preprocess
     classOut = dictionaryReplace(dataIn,getDefaultDictionary('classes'));
 
     % replace 
-    
     classOut(contains(classOut,'anymut')) = {'mutation (any)'};
-    
     classOut(contains(classOut,'driver')) = {'mutation (driver)'};
-    
     classOut(contains(classOut,'subtype')) = {'signature/subtype'};
-    
     classOut(contains(classOut,'signature')) = {'signature/subtype'};
-    
     classOut(contains(classOut,'standard')) = {'standard'};
-    
     classOut(contains(classOut,'experimental')) = {'experimental'};
-    
     
 end

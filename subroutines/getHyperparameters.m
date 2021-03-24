@@ -6,7 +6,7 @@
 % this function contains hard-coded default hyperparameters 
 % for neural network training and deployment 
 
-function hyperprm = getDeepHyperparameters(paramset)
+function hyperprm = getHyperparameters(paramset)
 
 % hard-code our default deep learning hyperparameters 
 hyperprm.ValidationFrequency = 50;  % check validation performance every N iterations, 500 is 3x per epoch
@@ -16,7 +16,6 @@ hyperprm.MiniBatchSize = 512;    	% mini batch size, limited by GPU RAM, default
 hyperprm.MaxEpochs = 4;             % max. epochs for training, default 4
 hyperprm.learnRateFactor = 2;       % learning rate factor for rewired layers
 hyperprm.ExecutionEnvironment = 'gpu'; % environment for training and classification
-hyperprm.PixelRangeShear = 5;       % max. shear (in pixels) for image augmenter (legacy)
 hyperprm.InitialLearnRate =  5e-5;  % linear learning rate, default 5e-5
 hyperprm.hotLayers = 30;            % number of hot layers in the network (count from end, default 30)
 hyperprm.GradientDecayFactor = 0.9; % adam's default (explicit is better than implicit)
@@ -29,6 +28,11 @@ disp(['- loading hyperparameter set: ',paramset]);
 switch lower(paramset)
     case 'default'
         disp('-- no hyperparam modification needed');
+    case 'px224_60'
+        disp('-- large mini batch size and a lot of trainable layers');
+        hyperprm.MiniBatchSize = 1024;
+        hyperprm.MBSclassify = 1024;
+        hyperprm.hotLayers = 60;
     case 'megaproject'
         hyperprm.MaxEpochs = 8;
         hyperprm.ValidationPatience = 5;

@@ -26,7 +26,7 @@ function [patientStats, varargout] = predictions2performance(blockPred,AnnData,c
     uPats = unique(removeEmptyCells(allPatientNames)); % unique nonempty patients
     uCats = unique(AnnData.TARGET);  % unique target categories
     
-    for i = 1:numel(uPats)
+    for i = 1:numel(uPats) % iterate all patients
         patientPredictions.patientNames(i) = uPats(i);
         % find true category of this patient
         currTrueCategory = AnnData.TARGET(strcmp(AnnData.PATIENT,uPats{i}));
@@ -43,27 +43,34 @@ function [patientStats, varargout] = predictions2performance(blockPred,AnnData,c
         for uc = 1:numel(uCats)
             if isfield(cnst,'aggregateMode') && strcmp(cnst.aggregateMode,'mean')
                 patientPredictions.predictions.(char(uCats(uc)))(i) = ...
-                    mean(double(currScores(:,uc)));  
+                    mean(double(currScores(:,uc)));
             elseif isfield(cnst,'aggregateMode') && strcmp(cnst.aggregateMode,'max')
                 patientPredictions.predictions.(char(uCats(uc)))(i) = ...
                     max(double(currScores(:,uc)));     
-            else % majority vote
+            elseif isfield(cnst,'aggregateMode') && strcmp(cnst.aggregateMode,'ignoreClass')
+                currLabelsClean = currLabels;
+                currLabelsClean(currLabelsClean==categorical(cnst.whichIgnoreClass)) = [];
+                patientPredictions.predictions.(char(uCats(uc)))(i) = ...
+                    sum(currLabels==uCats(uc))/numel(currLabelsClean);
+            else % default majority vote
                 patientPredictions.predictions.(char(uCats(uc)))(i) = ...
                     sum(currLabels==uCats(uc))/numel(currLabels);
             end
         end
     end
     
-    % go from predictions to statistics
+    % go from predictions to stats, DANGER ZONE, do not play around here
     for uc = 1:numel(uCats) % statistics for each class
         
         patientStats.nPats.(char(uCats(uc))) = ...
             sum(patientPredictions.trueCategory==uCats(uc));
         
-        % calculate the AUC under ROC (FPR [fallout] vs. TPR [sens.])
+        % calculate the AUC under ROC (FPR [fallout] vs. TPR [sens.]) ----
+        disp('--- calculating ROC with default behavior');
         [X,Y,T,AUC,OPTROCPT] = perfcurve(patientPredictions.trueCategory,...
                patientPredictions.predictions.(char(uCats(uc))),uCats(uc),...
                'NBoot',cnst.nBootstrapAUC,'XCrit','fpr','YCrit','tpr');
+
         patientStats.FPR_TPR.AUC.(char(uCats(uc)))      = AUC;
         patientStats.FPR_TPR.Plot.X.(char(uCats(uc)))   = X;
         patientStats.FPR_TPR.Plot.Y.(char(uCats(uc)))   = Y;
@@ -71,7 +78,8 @@ function [patientStats, varargout] = predictions2performance(blockPred,AnnData,c
         patientStats.FPR_TPR.OPTROCPT.(char(uCats(uc))) = OPTROCPT;
         disp(['--- finished AUROC (x=fpr,y=tpr) for class ',char(uCats(uc)),' (AUROC = ',num2str(AUC),')']);
         
-        % calculate AUC of precision-recall curve 
+        % calculate AUC of precision-recall curve ------------------------
+        disp('--- calculating PRC with default behavior');
         [X,Y,T,AUC,OPTROCPT] = perfcurve(patientPredictions.trueCategory,...
                patientPredictions.predictions.(char(uCats(uc))),uCats(uc),...
                'NBoot',cnst.nBootstrapAUC,'XCrit','reca','YCrit','prec');

@@ -9,7 +9,7 @@
 function autoVisualize(varargin)
 
 addpath(genpath('./subroutines/'));      % add dependencies
-iPrs = getDefaultInputParser(varargin);  % get input parser, define default values
+iPrs = getInputParser(varargin);  % get input parser, define default values
 cnst = loadExperiment(iPrs.Results.experiment); % load experiment from JSON
 cnst.skipLoadingBlocks = true; % never load tiles for visualization
 disp('-- starting VISUALIZE job with these input (or default) settings:');
