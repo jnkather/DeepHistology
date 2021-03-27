@@ -49,7 +49,7 @@ function [patientStats, varargout] = predictions2performance(blockPred,AnnData,c
                     max(double(currScores(:,uc)));     
             elseif isfield(cnst,'aggregateMode') && strcmp(cnst.aggregateMode,'ignoreClass')
                 currLabelsClean = currLabels;
-                currLabelsClean(currLabelsClean==categorical(cnst.whichIgnoreClass)) = [];
+                currLabelsClean(currLabelsClean==categorical(cellstr(cnst.whichIgnoreClass))) = [];
                 patientPredictions.predictions.(char(uCats(uc)))(i) = ...
                     sum(currLabels==uCats(uc))/numel(currLabelsClean);
             else % default majority vote
