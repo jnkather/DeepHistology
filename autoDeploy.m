@@ -1,4 +1,4 @@
-% JN Kather 2018-2020
+% JN Kather 2018-2021
 % This is part of the DeepHistology repository
 % License: see separate LICENSE file 
 % 
@@ -44,10 +44,10 @@ for ti = 1:numel(cnst.allTargets)
      AnnData = getAnnotationData(cnst); 
      [allBlocks, AnnData, ~] = assignTileLabel(allBlocks,AnnData,cnst);
           
-    partitionPredictions = deployModel(cnst,hyperprm,finalModel,allBlocks);
+    blockLevelPredictions = deployModel(cnst,hyperprm,finalModel,allBlocks);
     
     % combine stats
-    resultCollection{ti}.blockStats = concatenatePredictions(partitionPredictions);
+    resultCollection{ti}.blockStats = concatenatePredictions(blockLevelPredictions);
     resultCollection{ti}.patientStats = predictions2performance(...
         resultCollection{ti}.blockStats,AnnData,cnst);
 

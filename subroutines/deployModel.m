@@ -21,6 +21,7 @@ function stats = deployModel(cnst,hyperprm,finalModel,imdsTST)
   disp('finished prediction.');
   stats.blockStats.Accuracy = mean(stats.blockStats.PLabels == imdsTST.Labels);
   stats.blockStats.BlockNames = imdsTST.Files;
+  stats.blockStats.outClasses = finalModel.Layers(end).Classes;
   
   if isfield(cnst,'saveTopTiles') && cnst.saveTopTiles>0
         saveTopTiles(stats,cnst,finalModel,imdsTST);

@@ -5,7 +5,7 @@
 % documentation for this function:
 % this function is used to train the actual neural network 
 
-function [postNet,stats] = trainMyNetwork(preNet,imdsTRN,imdsTST,cnst,hyperprm)          
+function [postNet,myPredictions] = trainMyNetwork(preNet,imdsTRN,imdsTST,cnst,hyperprm)          
     rng('default');
     
     if isempty(imdsTST)
@@ -34,20 +34,21 @@ function [postNet,stats] = trainMyNetwork(preNet,imdsTRN,imdsTST,cnst,hyperprm)
     
     t = tic;
     postNet = trainNetwork(imdsTRN_AUG, preNet.lgraph, opts);
-    stats.trainTime = toc(t);
+    myPredictions.trainTime = toc(t);
+    myPredictions.blockStats.outClasses = postNet.Layers(end).Classes; 
     
     if ~isempty(imdsTST) % evaluate test set
         disp('- starting to evaluate test set');
         externalTST_AUG = augmentedImageDatastore(preNet.imageInputSize,imdsTST,...
             'OutputSizeMode',cnst.blocks.resizeMethod); 
         externalTST_AUG.MiniBatchSize = hyperprm.MiniBatchSize;
-        [stats.blockStats.PLabels,stats.blockStats.Scores] = classify(postNet, ...
+        [myPredictions.blockStats.PLabels,myPredictions.blockStats.Scores] = classify(postNet, ...
             externalTST_AUG, 'ExecutionEnvironment',hyperprm.ExecutionEnvironment,...
             'MiniBatchSize',hyperprm.MBSclassify);
-        stats.blockStats.Accuracy = mean(stats.blockStats.PLabels == imdsTST.Labels);
-        stats.blockStats.BlockNames = imdsTST.Files;
+        myPredictions.blockStats.Accuracy = mean(myPredictions.blockStats.PLabels == imdsTST.Labels);
+        myPredictions.blockStats.BlockNames = imdsTST.Files;
     else % no test set defined, so cannot return any stats
         disp('no test set defined, so cannot return any stats');
-        stats.blockStats = [];
+        myPredictions.blockStats = [];
     end        
 end

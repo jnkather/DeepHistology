@@ -25,7 +25,8 @@ function p = getInputParser(myVargs)
     addParameter(p,'binarizeQuantile',[]); % split HI LO at this quantile (between 0 and 0.5)
     addParameter(p,'foldxval',3,@isnumeric); % if cross validation is used, this is the fold, default 3
     addParameter(p,'xvalmode','xval',@ischar); % can be 'xval' or 'holdout' (= only first run)
-    addParameter(p,'aggregateMode','majority',@ischar); % how to pool block predictions per patient, 'majority', 'ignoreClass', 'mean' or 'max'
+    addParameter(p,'aggregateMode','majority',@ischar); % how to pool block predictions per patient,...
+    % 'majority', 'majorityRobust' (works also if one of the classes is not present in the test set), 'ignoreClass', 'mean' or 'max'
     addParameter(p,'tableModeClini','XLSX',@ischar); % file format of clinical table, XLSX or CSV
     addParameter(p,'hyper','default',@ischar); % set of hyperparameters
     addParameter(p,'valSet',[],@isnumeric); % validation set proportion of training set, default no validation (recommend 0.05)

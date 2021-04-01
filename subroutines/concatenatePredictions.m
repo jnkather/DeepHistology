@@ -19,13 +19,16 @@ else
     for i = 1:numel(stats) % iterate test sets from each crossval experiment and merge
         disp(['--- parsing partition ',num2str(i)]);
         if i ==1
-            outStats.PLabels     = stats{i}.blockStats.PLabels;
-            outStats.Scores      = stats{i}.blockStats.Scores;
-            outStats.BlockNames  = stats{i}.blockStats.BlockNames;
+            outStats.PLabels         = stats{i}.blockStats.PLabels;
+            outStats.Scores          = stats{i}.blockStats.Scores;
+            outStats.BlockNames      = stats{i}.blockStats.BlockNames;
+            outStats.outClasses      = stats{i}.blockStats.outClasses;
         else
             outStats.PLabels     = [outStats.PLabels;stats{i}.blockStats.PLabels];
             outStats.Scores      = [outStats.Scores;stats{i}.blockStats.Scores];
             outStats.BlockNames  = [outStats.BlockNames;stats{i}.blockStats.BlockNames];
+            sanityCheck(~any(outStats.outClasses~=stats{i}.blockStats.outClasses),...
+                ['output classes in partition ',num2str(i),' match the 1st']);
         end
         outStats.partitions{i} = stats{i}.blockStats.BlockNames;
     end

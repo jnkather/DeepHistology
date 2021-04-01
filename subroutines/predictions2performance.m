@@ -10,7 +10,7 @@
 
 function [patientStats, varargout] = predictions2performance(blockPred,AnnData,cnst)
 
-    disp('-- starting to calculate statistics (AUROC, AUCPR)');
+    disp(['-- calculating statistics (AUROC, AUCPR) with mode: ',cnst.aggregateMode]);
     
     % for each block (tile), find the corresponding slide file name
     allFileNames = block2filename(blockPred.BlockNames);    
@@ -24,71 +24,91 @@ function [patientStats, varargout] = predictions2performance(blockPred,AnnData,c
 
     % get true target value for each patient
     uPats = unique(removeEmptyCells(allPatientNames)); % unique nonempty patients
-    uCats = unique(AnnData.TARGET);  % unique target categories
+    netCats = blockPred.outClasses';   % network output categories
+    patCats = unique(AnnData.TARGET);  % input patient unique categories
+    
+    if numel(netCats) == numel(patCats)
+        disp('--- number of network output categories = number of unique patient categories');
+        sanityCheck(~any(sort(unique(AnnData.TARGET))~=sort(netCats)),'network and patient categories match');
+        softSanityCheck(~any(patCats~=netCats),'network and patient category order matches');     
+    else
+        warning('--- number of network output categories NOT EQUAL number of unique patient categories: ');
+        netCats
+        patCats
+        disp('----- be very careful! only continue if you know what you are doing! ');
+    end
     
     for i = 1:numel(uPats) % iterate all patients
         patientPredictions.patientNames(i) = uPats(i);
         % find true category of this patient
         currTrueCategory = AnnData.TARGET(strcmp(AnnData.PATIENT,uPats{i}));
         if numel(currTrueCategory)>1 % if there were >1 slide, check their labels match
-            sanityCheck(numel(unique(currTrueCategory))==1,'>1 slide with matching labels');
+            sanityCheck(numel(unique(currTrueCategory))==1,'found >1 slide with matching labels');
         end
         patientPredictions.trueCategory(i) = currTrueCategory(1);
         % which target value has been predicted?
         blocksOfInterest = strcmp(allPatientNames,uPats{i});
         currLabels = blockPred.PLabels(blocksOfInterest);
         currScores = blockPred.Scores(blocksOfInterest,:);
+        [~,highestIndexCurrScores] = max(currScores,[],2);
         % which patient does each tile belong to?
         blockPred.parentPatient(blocksOfInterest) = repmat(uPats(i),sum(blocksOfInterest),1);
-        for uc = 1:numel(uCats)
-            if isfield(cnst,'aggregateMode') && strcmp(cnst.aggregateMode,'mean')
-                patientPredictions.predictions.(char(uCats(uc)))(i) = ...
+        for uc = 1:numel(netCats)
+            switch(cnst.aggregateMode)
+                case 'mean'
+                patientPredictions.predictions.(char(netCats(uc)))(i) = ...
                     mean(double(currScores(:,uc)));
-            elseif isfield(cnst,'aggregateMode') && strcmp(cnst.aggregateMode,'max')
-                patientPredictions.predictions.(char(uCats(uc)))(i) = ...
+                case 'max'
+                patientPredictions.predictions.(char(netCats(uc)))(i) = ...
                     max(double(currScores(:,uc)));     
-            elseif isfield(cnst,'aggregateMode') && strcmp(cnst.aggregateMode,'ignoreClass')
+                case 'ignoreClass'
                 currLabelsClean = currLabels;
                 currLabelsClean(currLabelsClean==categorical(cellstr(cnst.whichIgnoreClass))) = [];
-                patientPredictions.predictions.(char(uCats(uc)))(i) = ...
-                    sum(currLabels==uCats(uc))/numel(currLabelsClean);
-            else % default majority vote
-                patientPredictions.predictions.(char(uCats(uc)))(i) = ...
-                    sum(currLabels==uCats(uc))/numel(currLabels);
+                patientPredictions.predictions.(char(netCats(uc)))(i) = ...
+                    sum(currLabels==netCats(uc))/numel(currLabelsClean);
+                case 'majorityRobust'
+                    patientPredictions.predictions.(char(netCats(uc)))(i) = ...
+                    sum(highestIndexCurrScores==uc)/numel(currLabels);
+                case 'majority' % default majority vote
+                    patientPredictions.predictions.(char(netCats(uc)))(i) = ...
+                    sum(currLabels==netCats(uc))/numel(currLabels);
+                otherwise
+                    error('-- invalid aggregation mode');
             end
         end
     end
     
+    
     % go from predictions to stats, DANGER ZONE, do not play around here
-    for uc = 1:numel(uCats) % statistics for each class
+    disp('--- calculating statistics for all PATIENT categories (not NETWORK output categories)');
+    for uc = 1:numel(patCats) % statistics for each class which is present
         
-        patientStats.nPats.(char(uCats(uc))) = ...
-            sum(patientPredictions.trueCategory==uCats(uc));
+        patientStats.nPats.(char(patCats(uc))) = ...
+            sum(patientPredictions.trueCategory==patCats(uc));
         
         % calculate the AUC under ROC (FPR [fallout] vs. TPR [sens.]) ----
         disp('--- calculating ROC with default behavior');
         [X,Y,T,AUC,OPTROCPT] = perfcurve(patientPredictions.trueCategory,...
-               patientPredictions.predictions.(char(uCats(uc))),uCats(uc),...
+               patientPredictions.predictions.(char(patCats(uc))),patCats(uc),...
                'NBoot',cnst.nBootstrapAUC,'XCrit','fpr','YCrit','tpr');
-
-        patientStats.FPR_TPR.AUC.(char(uCats(uc)))      = AUC;
-        patientStats.FPR_TPR.Plot.X.(char(uCats(uc)))   = X;
-        patientStats.FPR_TPR.Plot.Y.(char(uCats(uc)))   = Y;
-        patientStats.FPR_TPR.Plot.T.(char(uCats(uc)))   = T;
-        patientStats.FPR_TPR.OPTROCPT.(char(uCats(uc))) = OPTROCPT;
-        disp(['--- finished AUROC (x=fpr,y=tpr) for class ',char(uCats(uc)),' (AUROC = ',num2str(AUC),')']);
+        patientStats.FPR_TPR.AUC.(char(patCats(uc)))      = AUC;
+        patientStats.FPR_TPR.Plot.X.(char(patCats(uc)))   = X;
+        patientStats.FPR_TPR.Plot.Y.(char(patCats(uc)))   = Y;
+        patientStats.FPR_TPR.Plot.T.(char(patCats(uc)))   = T;
+        patientStats.FPR_TPR.OPTROCPT.(char(patCats(uc))) = OPTROCPT;
+        disp(['--- finished AUROC (x=fpr,y=tpr) for class ',char(patCats(uc)),' (AUROC = ',num2str(AUC),')']);
         
         % calculate AUC of precision-recall curve ------------------------
         disp('--- calculating PRC with default behavior');
         [X,Y,T,AUC,OPTROCPT] = perfcurve(patientPredictions.trueCategory,...
-               patientPredictions.predictions.(char(uCats(uc))),uCats(uc),...
+               patientPredictions.predictions.(char(patCats(uc))),patCats(uc),...
                'NBoot',cnst.nBootstrapAUC,'XCrit','reca','YCrit','prec');
-        patientStats.PRE_REC.AUC.(char(uCats(uc)))      = AUC;
-        patientStats.PRE_REC.Plot.X.(char(uCats(uc)))   = X;
-        patientStats.PRE_REC.Plot.Y.(char(uCats(uc)))   = Y;
-        patientStats.PRE_REC.Plot.T.(char(uCats(uc)))   = T;
-        patientStats.PRE_REC.OPTROCPT.(char(uCats(uc))) = OPTROCPT;
-        disp(['--- finished AUCPR (x=reca,y=prec) for class ',char(uCats(uc)),' (AUCPR = ',num2str(AUC),')']);
+        patientStats.PRE_REC.AUC.(char(patCats(uc)))      = AUC;
+        patientStats.PRE_REC.Plot.X.(char(patCats(uc)))   = X;
+        patientStats.PRE_REC.Plot.Y.(char(patCats(uc)))   = Y;
+        patientStats.PRE_REC.Plot.T.(char(patCats(uc)))   = T;
+        patientStats.PRE_REC.OPTROCPT.(char(patCats(uc))) = OPTROCPT;
+        disp(['--- finished AUCPR (x=reca,y=prec) for class ',char(patCats(uc)),' (AUCPR = ',num2str(AUC),')']);
         
     end
     

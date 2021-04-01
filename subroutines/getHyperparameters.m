@@ -28,11 +28,11 @@ disp(['- loading hyperparameter set: ',paramset]);
 switch lower(paramset)
     case 'default'
         disp('-- no hyperparam modification needed');
-    case 'px224_60'
+    case 'px224_80'
         disp('-- large mini batch size and a lot of trainable layers');
         hyperprm.MiniBatchSize = 1024;
         hyperprm.MBSclassify = 1024;
-        hyperprm.hotLayers = 60;
+        hyperprm.hotLayers = 80;
     case 'megaproject'
         hyperprm.MaxEpochs = 8;
         hyperprm.ValidationPatience = 5;
@@ -62,9 +62,14 @@ switch lower(paramset)
     case 'deploy'
         disp('--- deploy hyperparams');
         hyperprm.MiniBatchSize = 1024;
+    case 'debug'
+        disp('--- debug hyperparams');
+        hyperprm.MiniBatchSize = 128;
     case 'verylowresource'
         disp('--- low resource hyperparams');
         hyperprm.MiniBatchSize = 128;
+        hyperprm.MaxEpochs = 1;
+        hyperprm.hotLayers = 5;
     case 'mega'
         disp('--- mega block hyperparams');
         hyperprm.hotLayers = 10;

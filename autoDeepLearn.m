@@ -82,7 +82,7 @@ for ti = 1:numel(cnst.allTargets) % iterate target variables in this experiment
                     exportTiles(cnst,imdsTRN,imdsTST);
                 end
                 % train the network
-                [~,partitionPredictions{ir}] = trainMyNetwork(myNet,imdsTRN,imdsTST,cnst,hyperprm); %!ok
+                [~,partitionPredictions{ir}] = trainMyNetwork(myNet,imdsTRN,imdsTST,cnst,hyperprm); 
                 % if holdout mode is active, then stop xval after 1st run
                 if ir == 1 && isfield(cnst,'xvalmode') && strcmp(cnst.xvalmode,'holdout')
                     disp('-- train in holdout mode = use only first xval run');
@@ -99,7 +99,7 @@ for ti = 1:numel(cnst.allTargets) % iterate target variables in this experiment
         end
         if cnst.trainFull % re-train on the full image set for deployment
             disp('training on full set for external validation');
-            trainFullTrainingSet = equalizeClasses(allBlocks);
+            trainFullTrainingSet = equalizeClasses(allBlocks,cnst.maxBlocksPerClass);
             [finalModel,~] = trainMyNetwork(myNet,trainFullTrainingSet,[],cnst,hyperprm);   
         end
         totalTime = toc(z1);

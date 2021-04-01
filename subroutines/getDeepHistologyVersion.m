@@ -1,6 +1,6 @@
 function version = getDeepHistologyVersion()
 
-    version = 'v6.32 - 24 Mar 2021';
+    version = 'v6.33 - 01 Apr 2021';
     
     disp('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
     disp(['~~~~           this is version: ', version, '         ~~~~']);
