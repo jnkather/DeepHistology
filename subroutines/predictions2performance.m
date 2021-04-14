@@ -27,12 +27,11 @@ function [patientStats, varargout] = predictions2performance(blockPred,AnnData,c
     netCats = blockPred.outClasses';   % network output categories
     patCats = unique(AnnData.TARGET);  % input patient unique categories
     
-    if numel(netCats) == numel(patCats)
-        disp('--- number of network output categories = number of unique patient categories');
-        sanityCheck(~any(sort(unique(AnnData.TARGET))~=sort(netCats)),'network and patient categories match');
-        softSanityCheck(~any(patCats~=netCats),'network and patient category order matches');     
+    if isempty([setdiff(netCats,patCats),setdiff(patCats,netCats)])
+        disp('--- network and patient categories match :-)');
+        softSanityCheck(~any(patCats~=netCats),'network output category order matches and patient category order');     
     else
-        warning('--- number of network output categories NOT EQUAL number of unique patient categories: ');
+        warning('--- network and patient categories do not match: ');
         netCats
         patCats
         disp('----- be very careful! only continue if you know what you are doing! ');
