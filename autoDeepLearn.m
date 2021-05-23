@@ -85,7 +85,7 @@ for ti = 1:numel(cnst.allTargets) % iterate target variables in this experiment
                 [~,partitionPredictions{ir}] = trainMyNetwork(myNet,imdsTRN,imdsTST,cnst,hyperprm); 
                 if isfield(cnst,'evalAfterEachRun') && cnst.evalAfterEachRun
                     % calculate AUROC for this fold only, will not be saved
-                    patientStatsThisFold = predictions2performance(concatenatePredictions(partitionPredictions{ir}),AnnData,cnst);
+                    resultCollection.patientStatsFold{ir} = predictions2performance(concatenatePredictions(partitionPredictions{ir}),AnnData,cnst);
                 end
                 % if holdout mode is active, then stop xval after 1st run
                 if ir == 1 && isfield(cnst,'xvalmode') && strcmp(cnst.xvalmode,'holdout')
