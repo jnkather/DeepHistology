@@ -200,6 +200,7 @@ if cnst.plotForest
    forest(IDs(flt),myT.AUROC_avg(flt),myT.AUROC_low(flt),myT.AUROC_hig(flt),cnst.codename,10);
 end
 
+mkdir('./output_tables/');
 writetable(myT,['./output_tables/',...
      cnst.codename,'_',strrep(char(datetime),':','-'),'_lastTable.xlsx']);
  

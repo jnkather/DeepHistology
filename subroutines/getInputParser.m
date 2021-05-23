@@ -38,6 +38,7 @@ function p = getInputParser(myVargs)
     addParameter(p,'maxBlocksPerClass',1e9,@isnumeric); % hard limit to the number of tiles per class in xval mode
     addParameter(p,'nBootstrapAUC',10,@isnumeric);   % bootstrap for AUC confidence interval, default 10
     addParameter(p,'whichIgnoreClass','',@ischar); % ignore this class for statistics, only works if aggregateMode is ignoreClass
+    addParameter(p,'evalAfterEachRun',false,@islogical); % ignore this class for statistics, only works if aggregateMode is ignoreClass
     
     % holy input parameters, do not change
     addParameter(p,'saveUnmatchedBlocks',false,@islogical);   % save list of unmatchable blocks, may blow up output file size
